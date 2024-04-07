@@ -8,11 +8,11 @@
 #include "../INCLUDES/SWITCH.h"
 #include "../INCLUDES/Keypad.h"
 
-extern const KEYPAD_t KEYPAD_Configuration[8];
-extern const u8 KEYPAD_Keys[4][4];
+extern const KEYPAD_t KEYPAD_Configuration[NUM_OF_PINS];
+extern const u8 KEYPAD_Keys[ROWS_NUM][COLS_NUM];
 u8 G_col=0;
 u8 G_row=0;
-u8 G_swState[4][4]={0};
+u8 G_swState[ROWS_NUM][COLS_NUM]={0};
 //KeypadPost_t KEYPAD_postion;
 
 void KEYPAD_Init(void)
@@ -20,7 +20,7 @@ void KEYPAD_Init(void)
 	GPIO_pin_t sw;
 	sw.pinSpeed=PIN_SPEED_HIGH_SPEED;
 
-	for(u32 itr=0; itr<8; itr++)
+	for(u32 itr=0; itr<NUM_OF_PINS; itr++)
 	{
 		switch(KEYPAD_Configuration[itr].connection)
 		{
