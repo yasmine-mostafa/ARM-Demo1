@@ -8,45 +8,13 @@
 #include "Error.h"
 #include "STD_TYPES.h"
 #include "USART.h"
-
+#include "Mode.h"
+#include "Edit.h"
+#include "StopWatch.h"
 
 #define START 0
 #define PAUSE 1
 #define CONTINUE 2
-
-
-typedef enum
-{
-	No_EditAction,
-	UP_ARROW ,
-	DOWN_ARROW,
-	RIGHT_ARROW,
-	LEFT_ARROW,
-	INCREASE_BUTTON,
-	DECREASE_BUTTON,
-	OK
-}EditPressedButton_t;
-
-typedef enum
-{
-	DISPLAY_MODE,
-	STOP_WATCH_MODE
-}SelectMode_t;
-
-typedef enum
-{
-	No_Action,
-	STOP_WATCH_START,
-	STOP_WATCH_PAUSE,
-	STOP_WATCH_CONTINUE,
-	STOP_WATCH_RESET
-}StopWatchControl_t;
-
-typedef enum
-{
-	EditON,
-	EditOFF
-}EditState_t;
 
 USART_RXBuffer USART_RX=
 {
@@ -55,7 +23,6 @@ USART_RXBuffer USART_RX=
 		.Size=1,
 		.Index=0,
 };
-
 
 EditState_t G_enuEdit_flag=EditOFF;
 SelectMode_t G_enuMode= DISPLAY_MODE;
