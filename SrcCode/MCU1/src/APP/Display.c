@@ -76,6 +76,10 @@ void DisplayTimeMode_Runnable(void)
 	if(G_enuMode==DISPLAY_MODE)
 	{
 		G_u8MSecs+=PERIODICITY;
+		if(G_u8MSecs%1000==0)
+		{
+			LCD_ClearScreenAsynch();
+		}
 		LCD_ClearScreenAsynch();
 		LCD_WriteStringAsynch("DATE:");
 		if(G_u8Days>=10)
@@ -192,6 +196,7 @@ void DisplayTimeMode_Runnable(void)
 		}
 
 	}
+	G_u8EditMode=1;
 	if(G_u8EditMode)
 	{
 		Edit_Runnable();
@@ -211,7 +216,6 @@ void Edit_Runnable(void)
 	G_u8EditDays=G_u8Days;
 	G_u8EditHours=G_u8hours;
 	G_u8EditSecs=G_u8Secs;
-	LCD_ClearScreenAsynch();
 	LCD_SetCursorPositionAsynch(G_u8CurrRow,G_u8CurrCol);
 	KEYPAD_voidGetPressedKey(&G_PressedButton);
 	switch(G_PressedButton)
