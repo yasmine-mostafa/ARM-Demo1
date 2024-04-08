@@ -10,7 +10,8 @@
 #include "GPIO.h"
 #include "LCD_CFG.h"
 #include "LCD.h"
-
+#include "Mode.h"
+#include "StopWatch.h"
 
 #define PERIODICITY 50
 #define FIRST_ROW 0
@@ -21,22 +22,8 @@
 #define MODE_ON 1
 #define MODE_RESET 2
 #define MAX_MSEC 100
-#define MAX_SEC 60\
+#define MAX_SEC 60
 
-typedef enum
-{
-	DISPLAY_MODE,
-	STOP_WATCH_MODE
-}SelectMode_t;
-
-typedef enum
-{
-	No_Action,
-	STOP_WATCH_START,
-	STOP_WATCH_PAUSE,
-	STOP_WATCH_CONTINUE,
-	STOP_WATCH_RESET
-}StopWatchControl_t;
 
 extern SelectMode_t G_enuMode;
 extern StopWatchControl_t G_enuStopWatchControl;
