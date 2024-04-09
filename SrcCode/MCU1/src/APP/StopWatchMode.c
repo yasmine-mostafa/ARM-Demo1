@@ -5,6 +5,10 @@
  *      Author: Yasmine Mostafa
  */
 
+/****************************************************************************************
+ *                        	              Includes                                      *
+ ****************************************************************************************/
+
 #include "Error.h"
 #include "STD_TYPES.h"
 #include "GPIO.h"
@@ -12,6 +16,10 @@
 #include "LCD.h"
 #include "Mode.h"
 #include "StopWatch.h"
+
+/****************************************************************************************
+ *                        	              Defines                                       *
+ ****************************************************************************************/
 
 #define PERIODICITY 50
 #define FIRST_ROW 0
@@ -24,10 +32,20 @@
 #define MAX_MSEC 100
 #define MAX_SEC 60
 
+/****************************************************************************************
+ *                        	            Variables                                     *
+ ****************************************************************************************/
 
 extern SelectMode_t G_enuMode;
 extern StopWatchControl_t G_enuStopWatchControl;
 
+/****************************************************************************************
+ *                        	              Runnable Implementation                    *
+ ****************************************************************************************/
+/**
+ *@brief  : Control the stopwatch.
+ *@periodicity:
+ */
 void StopWatchMode_Runnable(void) ////50 msec
 {
 	static u8 Loc_mSec=0;
@@ -35,6 +53,7 @@ void StopWatchMode_Runnable(void) ////50 msec
 	static u8 Loc_Min=0;
 	static u8 Loc_Mode=MODE_OFF;
 
+	/*Check if stop watch mode is on then display it on the LCD*/
 	if(G_enuMode == STOP_WATCH_MODE)
 	{
 		LCD_ClearScreenAsynch();
@@ -109,9 +128,11 @@ void StopWatchMode_Runnable(void) ////50 msec
 
 	}
 
+	/*Increment the numbers*/
 	if(Loc_Mode == MODE_ON)
 	{
 		Loc_mSec+=PERIODICITY;
+
 		if(Loc_mSec == MAX_MSEC)
 		{
 			Loc_mSec=0;
@@ -123,6 +144,7 @@ void StopWatchMode_Runnable(void) ////50 msec
 			Loc_Min++;
 		}
 	}
+	/*Reset the numbers and display zeroes on LCD*/
 	else if(Loc_Mode == MODE_RESET)
 	{
 		Loc_mSec=0;
