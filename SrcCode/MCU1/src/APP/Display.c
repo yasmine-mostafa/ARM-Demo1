@@ -5,8 +5,9 @@
  *      Author: Noha
  */
 
-#include "LCD.h"
+#include "../../include/HAL/LCD/LCD.h"
 #include "STD_TYPES.h"
+#include "Keypad.h"
 #define PERIODICITY 500
 
 #define FIRST_ROW  0
@@ -48,7 +49,7 @@ typedef enum
 	STOP_WATCH_MODE
 }SelectMode_t;
 
-SelectMode_t G_enuMode;
+SelectMode_t G_enuMode = DISPLAY_MODE;
 
 
 u32 G_u32Years=2024;
@@ -71,145 +72,10 @@ u8 G_u8CurrRow=0;
 u8 G_u8CurrCol=5;
 u8 G_PressedButton;
 
-void DisplayTimeMode_Runnable(void)
-{
-	if(G_enuMode==DISPLAY_MODE)
-	{
-		G_u8MSecs+=PERIODICITY;
-		if(G_u8MSecs%1000==0)
-		{
-			LCD_ClearScreenAsynch();
-		}
-		LCD_ClearScreenAsynch();
-		LCD_WriteStringAsynch("DATE:");
-		if(G_u8Days>=10)
-		{
-			LCD_WriteNumberAsynch(G_u8Days);
-
-		}
-		else
-		{
-			LCD_WriteNumberAsynch(0);
-			LCD_WriteNumberAsynch(G_u8Days);
-		}
-
-		LCD_WriteStringAsynch(".");
-		if(G_u8Month>=10)
-		{
-
-			LCD_WriteNumberAsynch(G_u8Month);
-
-		}
-		else
-		{
-			LCD_WriteNumberAsynch(0);
-			LCD_WriteNumberAsynch(G_u8Month);
-		}
-		LCD_WriteStringAsynch(".");
-		LCD_WriteNumberAsynch(G_u32Years);
-		LCD_SetCursorPositionAsynch(1,0);
-		LCD_WriteStringAsynch("TIME:");
-		if(G_u8hours<10)
-		{
-			LCD_WriteNumberAsynch(0);
-			LCD_WriteNumberAsynch(G_u8hours);
-
-		}
-		else
-		{
-			LCD_WriteNumberAsynch(G_u8hours);
-		}
-		LCD_WriteStringAsynch(".");
-		if(G_u8Mins<10)
-		{
-			LCD_WriteNumberAsynch(0);
-			LCD_WriteNumberAsynch(G_u8Mins);
-
-		}
-		else
-		{
-			LCD_WriteNumberAsynch(G_u8Mins);
-		}
-		LCD_WriteStringAsynch(".");
-		if(G_u8Secs<10)
-		{
-			LCD_WriteNumberAsynch(0);
-			LCD_WriteNumberAsynch(G_u8Secs);
-
-		}
-		else
-		{
-			LCD_WriteNumberAsynch(G_u8Secs);
-		}
-		if (G_u8MSecs<=1000)
-		{
-			G_u8Secs++;
-			G_u8MSecs=0;
-		}
-		if(G_u8Secs>60)
-		{
-			G_u8Secs=0;
-			G_u8Mins++;
-		}
-		else
-		{
-
-		}
-		if (G_u8Mins==60)
-		{
-			G_u8Mins = 0;
-			G_u8hours++;
-		}
-		if (G_u8hours==24)
-		{
-			G_u8hours = 0;
-			G_u8Days++;
-		}
-		if (G_u8Days==29)
-		{
-			if(G_u8Month==2 && (G_u32Years%4 !=0))
-			{
-				G_u8Days = 1;
-				G_u8Month++;
-			}
-		}
-		if (G_u8Days==31)
-		{
-			if(		G_u8Month==4
-					||G_u8Month==6
-					||G_u8Month==9
-					||G_u8Month==11)
-			{
-					G_u8Days = 1;
-					G_u8Month++;
-			}
-		}
-		if(G_u8Days==32)
-		{
-			G_u8Days = 1;
-			G_u8Month++;
-		}
-		if (G_u8Month==13)
-		{
-			G_u8Month = 1;
-			G_u32Years++;
-		}
-
-	}
-	G_u8EditMode=1;
-	if(G_u8EditMode)
-	{
-		Edit_Runnable();
-
-	}
-
-}
-
-
 void Edit_Runnable(void)
 {
 	//noha
-	u8 Loc_u8PreviousValue;
+	//u8 Loc_u8PreviousValue;
 
 	G_u32EditYears=G_u32Years;
 	G_u8EditMonth=G_u8Month;
@@ -372,3 +238,133 @@ void Edit_Runnable(void)
 	}
 
 }
+
+void DisplayTimeMode_Runnable(void)
+{
+	if(G_enuMode==DISPLAY_MODE)
+	{
+		G_u8MSecs+=PERIODICITY;
+			LCD_ClearScreenAsynch();
+		LCD_WriteStringAsynch("DATE:");
+		if(G_u8Days>=10)
+		{
+			LCD_WriteNumberAsynch(G_u8Days);
+
+		}
+		else
+		{
+			LCD_WriteNumberAsynch(0);
+			LCD_WriteNumberAsynch(G_u8Days);
+		}
+
+		LCD_WriteStringAsynch(".");
+		if(G_u8Month>=10)
+		{
+
+			LCD_WriteNumberAsynch(G_u8Month);
+
+		}
+		else
+		{
+			LCD_WriteNumberAsynch(0);
+			LCD_WriteNumberAsynch(G_u8Month);
+		}
+		LCD_WriteStringAsynch(".");
+		LCD_WriteNumberAsynch(G_u32Years);
+		LCD_SetCursorPositionAsynch(1,0);
+		LCD_WriteStringAsynch("TIME:");
+		if(G_u8hours<10)
+		{
+			LCD_WriteNumberAsynch(0);
+			LCD_WriteNumberAsynch(G_u8hours);
+
+		}
+		else
+		{
+			LCD_WriteNumberAsynch(G_u8hours);
+		}
+		LCD_WriteStringAsynch(":");
+		if(G_u8Mins<10)
+		{
+			LCD_WriteNumberAsynch(0);
+			LCD_WriteNumberAsynch(G_u8Mins);
+
+		}
+		else
+		{
+			LCD_WriteNumberAsynch(G_u8Mins);
+		}
+		LCD_WriteStringAsynch(":");
+		if(G_u8Secs<10)
+		{
+			LCD_WriteNumberAsynch(0);
+			LCD_WriteNumberAsynch(G_u8Secs);
+
+		}
+		else
+		{
+			LCD_WriteNumberAsynch(G_u8Secs);
+		}
+		if (G_u8MSecs<=1000)
+		{
+			G_u8Secs++;
+			G_u8MSecs=0;
+		}
+		if(G_u8Secs>60)
+		{
+			G_u8Secs=0;
+			G_u8Mins++;
+		}
+		else
+		{
+
+		}
+		if (G_u8Mins==60)
+		{
+			G_u8Mins = 0;
+			G_u8hours++;
+		}
+		if (G_u8hours==24)
+		{
+			G_u8hours = 0;
+			G_u8Days++;
+		}
+		if (G_u8Days==29)
+		{
+			if(G_u8Month==2 && (G_u32Years%4 !=0))
+			{
+				G_u8Days = 1;
+				G_u8Month++;
+			}
+		}
+		if (G_u8Days==31)
+		{
+			if(		G_u8Month==4
+					||G_u8Month==6
+					||G_u8Month==9
+					||G_u8Month==11)
+			{
+					G_u8Days = 1;
+					G_u8Month++;
+			}
+		}
+		if(G_u8Days==32)
+		{
+			G_u8Days = 1;
+			G_u8Month++;
+		}
+		if (G_u8Month==13)
+		{
+			G_u8Month = 1;
+			G_u32Years++;
+		}
+
+	}
+
+	if(1)
+	{
+		Edit_Runnable();
+	}
+}
+
+
