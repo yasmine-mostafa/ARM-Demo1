@@ -21,9 +21,6 @@ void Receive_RunnableFunc(void)
     static u8 Local_Count=0;
 
     USART_ReceiveBufferAsynchronous(&rx_buff);
-    volatile u8 Loc_Key = (u8)(rx_buff.Data);
-
-
     switch ((u8)(rx_buff.Data)) {
     case 'M': /*  Mode */
         ReceiveType.Mode ^= 1; // Toggle Mode
@@ -145,9 +142,9 @@ void Receive_RunnableFunc(void)
     default:
         break;
     }
-
+   /*  ِِِِِِِِUSART_SendByteAsynchronous(USART1,(u8)(rx_buff.Data)); *//*check*/
     rx_buff.Data=NULL;
-    USART_SendByteAsynchronous(USART1,Loc_Key);
+    
 
    
     
