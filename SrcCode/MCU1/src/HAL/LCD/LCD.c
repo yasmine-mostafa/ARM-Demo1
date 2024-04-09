@@ -10,6 +10,7 @@
  ****************************************************************************************/
 
 #include "Error.h"
+#include "STD_Types.h"
 #include "GPIO.h"
 #include "LCD.h"
 #include "LCD_CFG.h"

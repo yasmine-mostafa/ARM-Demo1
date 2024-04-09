@@ -48,10 +48,10 @@ extern StopWatchControl_t G_enuStopWatchControl;
  */
 void StopWatchMode_Runnable(void) ////50 msec
 {
-	static u8 Loc_mSec=0;
-	static u8 Loc_Sec=0;
-	static u8 Loc_Min=0;
-	static u8 Loc_Mode=MODE_OFF;
+	static u32 Loc_mSec=0;
+	static u32 Loc_Sec=0;
+	static u32 Loc_Min=0;
+	static u32 Loc_Mode=MODE_OFF;
 
 	/*Check if stop watch mode is on then display it on the LCD*/
 	if(G_enuMode == STOP_WATCH_MODE)
