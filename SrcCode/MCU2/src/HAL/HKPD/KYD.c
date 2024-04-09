@@ -3,10 +3,17 @@
 #include"HKPD/KYD.h"
 #include"MGPIO/GPIO.h"
 
-#define THRESHOLD     5
+#define THRESHOLD          5
+#define SWITCH_OFFSET_4    4
+#define SWITCH_PRESSED     1
+#define SWITCH_NOT_PRESSED 0 
+#define INIT               0
+#define PRESSED            1
+#define NOT_PRESSED        2
 
 extern tstr_KPDPinConfiguration KPD_Conf;
-static u8 SwitchState[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS] ;
+static char KPDPressedKey=0;
+static u8 NewValueflag=0;
 
 tenu_ErrorStatus KPD_INIT(void)
 {
@@ -40,99 +47,107 @@ tenu_ErrorStatus KPD_INIT(void)
 /******************************************************************************************************************************/
 void KPD_Runnable(void)
 {
-	u8 Local_Current;
-
+	u8 Local_Current=2;
+	//u8 Local_CurrentStatus =0;
+	u8 Local_CurrentPreesedKey=0;
 	/*define variable to loop on all col pins */
 	u8 Local_u8Index1=0;
 	/*define variable to loop on all row pins */
 	u8 Local_u8Index2=0;
-	/*define variable to store pin value */
-	u8 Local_u8PinValue=GPIO_High;
+	
 
-	static u8 Local_Prev[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS]={0};
-	static u8 Local_Counts[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS]={0};
-
+	static u8 Local_State[KPD_NUMBER_OF_ROWS*KPD_NUMBER_OF_COLUMNS]={INIT};
+	//static u8 Local_Counts[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS]={0};
 	/*local array to store keypad name that user entered it in configuration*/
 	u8 Local_u8KpdArr[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS] = KPD_ARRAY;
-	for(Local_u8Index1=0;Local_u8Index1<KPD_NUMBER_OF_COLUMNS;Local_u8Index1++)
+	for(Local_u8Index1=0;(Local_u8Index1<KPD_NUMBER_OF_COLUMNS&&Local_CurrentPreesedKey==0);Local_u8Index1++)
 	{
 		/*define col pin as output low */
 		MGPIO_SetPin(KPD_Conf.ColPortNumber[Local_u8Index1],KPD_Conf.ColPinNumber[Local_u8Index1],GPIO_Low);
 		/*read the current row (pressed--->low) (not pressed--->high)*/
-		for(Local_u8Index2=0;Local_u8Index2<KPD_NUMBER_OF_ROWS;Local_u8Index2++)
+		for(Local_u8Index2=0;(Local_u8Index2<KPD_NUMBER_OF_ROWS&&Local_CurrentPreesedKey==0);Local_u8Index2++)
 		{
-			/*get pin value of current row */
-			MGPIO_GetPinState(KPD_Conf.RowPortNumber[Local_u8Index2],KPD_Conf.RowPinNumber[Local_u8Index2],&Local_u8PinValue);
+
 			/*check if switch is pressed */
+			switch (Local_State[(Local_u8Index1*KPD_NUMBER_OF_ROWS)+Local_u8Index2])
+			{
+			case INIT:
+				/*get pin value of current row */
+				MGPIO_GetPinState(KPD_Conf.RowPortNumber[Local_u8Index2],KPD_Conf.RowPinNumber[Local_u8Index2],&Local_Current);
+				if(Local_Current==GPIO_Low)
+				{
+					Local_State[(Local_u8Index1*KPD_NUMBER_OF_ROWS)+Local_u8Index2]=PRESSED;
+				}
+				else
+				{
+					Local_State[(Local_u8Index1*KPD_NUMBER_OF_ROWS)+Local_u8Index2]=NOT_PRESSED;
+				}
+				break;
+			case PRESSED:
+				/*get pin value of current row */
+				MGPIO_GetPinState(KPD_Conf.RowPortNumber[Local_u8Index2],KPD_Conf.RowPinNumber[Local_u8Index2],&Local_Current);
+				if(Local_Current==GPIO_Low)
+				{
+					Local_CurrentPreesedKey=Local_u8KpdArr[Local_u8Index1][Local_u8Index2];
+				}
+				else
+				{
+					Local_State[(Local_u8Index1*KPD_NUMBER_OF_ROWS)+Local_u8Index2]=NOT_PRESSED;
+				}
+				break;	
+			case NOT_PRESSED:
+				/*get pin value of current row */
+				MGPIO_GetPinState(KPD_Conf.RowPortNumber[Local_u8Index2],KPD_Conf.RowPinNumber[Local_u8Index2],&Local_Current);
+				if(Local_Current==GPIO_Low)
+				{
+					Local_State[(Local_u8Index1*KPD_NUMBER_OF_ROWS)+Local_u8Index2]=PRESSED;
+				}
+
+				break;								
 			
-			if(Local_Current==Local_Prev[Local_u8Index1][Local_u8Index2])
-			{
-				Local_Counts[Local_u8Index1][Local_u8Index2]++;
+			default:
+				break;
 			}
-			else
-			{
-				Local_Counts[Local_u8Index1][Local_u8Index2]=0;
-			}
-			if(Local_Counts[Local_u8Index1][Local_u8Index2]==THRESHOLD)
-			{
-				SwitchState[Local_u8Index1][Local_u8Index2]=Local_Current;
-				Local_Counts[Local_u8Index1][Local_u8Index2]=0;
-			}
-			Local_Prev[Local_u8Index1][Local_u8Index2]=Local_Current;		
+				
 		}
 		/*define col pin as output high */
 		MGPIO_SetPin(KPD_Conf.ColPortNumber[Local_u8Index1],KPD_Conf.ColPinNumber[Local_u8Index1],GPIO_High);
 
+
 	}
+	if(Local_CurrentPreesedKey!=KPDPressedKey)
+	{
+		KPDPressedKey=Local_CurrentPreesedKey;
+		NewValueflag=1;
+	}
+	else
+	{
+		/*do nothing*/
+	}	
 
 }
 tenu_ErrorStatus KPD_GetPressedKey(u8 *Copy_pu8Key)
 {
-	u8 Local_Current;
+
 	/*define variable to indicating the success or failure of the function */
 	tenu_ErrorStatus Local_u8ErrorStatus = LBTY_OK;
-	/*define variable to loop on all col pins */
-	u8 Local_u8Index1=0;
-	/*define variable to loop on all row pins */
-	u8 Local_u8Index2=0;
-	/*define variable to store pin value */
-	u8 Local_u8PinValue=GPIO_High;
 
-	static u8 Local_Prev[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS]={0};
-	static u8 Local_Counts[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS]={0};
 	/*check if a NULL pointer is provided as input*/
-	if(Copy_pu8Key!=NULL){
-	/*local array to store keypad name that user entered it in configuration*/
-	u8 Local_u8KpdArr[KPD_NUMBER_OF_ROWS][KPD_NUMBER_OF_COLUMNS] = KPD_ARRAY;
-	for(Local_u8Index1=0;Local_u8Index1<KPD_NUMBER_OF_COLUMNS;Local_u8Index1++){
-		/*define col pin as output low */
-		Local_u8ErrorStatus=MGPIO_SetPin(KPD_Conf.ColPortNumber[Local_u8Index1],KPD_Conf.ColPinNumber[Local_u8Index1],GPIO_Low);
-		/*read the current row (pressed--->low) (not pressed--->high)*/
-		for(Local_u8Index2=0;Local_u8Index2<KPD_NUMBER_OF_ROWS;Local_u8Index2++)
+	if(Copy_pu8Key!=NULL)
+	{
+		if((NewValueflag==1)&&(KPDPressedKey!=0))
 		{
-			/*get pin value of current row */
-			Local_u8ErrorStatus=MGPIO_GetPinState(KPD_Conf.RowPortNumber[Local_u8Index2],KPD_Conf.RowPinNumber[Local_u8Index2],&Local_u8PinValue);
-			/*check if switch is pressed */
-			if(Local_Current==Local_Prev[Local_u8Index1][Local_u8Index2])
-			{
-				Local_Counts[Local_u8Index1][Local_u8Index2]++;
-			}
-			else
-			{
-				Local_Counts[Local_u8Index1][Local_u8Index2]=0;
-			}
-			if(Local_Counts[Local_u8Index1][Local_u8Index2]==THRESHOLD)
-			{
-				SwitchState[Local_u8Index1][Local_u8Index2]=Local_Current;
-				Local_Counts[Local_u8Index1][Local_u8Index2]=0;
-			}
-			Local_Prev[Local_u8Index1][Local_u8Index2]=Local_Current;		
+			*Copy_pu8Key=KPDPressedKey;
+			NewValueflag=0;
 		}
-		/*define col pin as output high */
-		Local_u8ErrorStatus=MGPIO_SetPin(KPD_Conf.ColPortNumber[Local_u8Index1],KPD_Conf.ColPinNumber[Local_u8Index1],GPIO_High);
+		else
+		{
+			*Copy_pu8Key=0;
+		}
 
 	}
-	}
+		
+	
 	else
 	{
 		/*if a NULL pointer is provided as input return NOK*/

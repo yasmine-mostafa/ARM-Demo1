@@ -18,10 +18,11 @@
 /********************************************************************************************************/
 typedef enum {
     LCD_Runnable=0,
-    SW_Runnable,
-    APP1_Runnable,
-    APP2_Runnable,
-	TrafficLight_Runnable,
+    KPD_Runnables,
+    Sender_Runnable,
+    Receiver_Runnable,
+    Display_Runnable,
+
 
 
     

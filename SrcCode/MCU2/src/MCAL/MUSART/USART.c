@@ -332,7 +332,7 @@ USART_enuErrorStatus USART_ReceiveBufferAsynchronous(USART_RXBuffer * ReceiveBuf
 		else
 		{
 			Uart_prvRx_BuzyFlag[Local_ChannelIdx] = USART_BUSY;
-			Uart_prvRx_BufferReceive[Local_ChannelIdx]=(u8 *)&(ReceiveBuffer->Data);
+			Uart_prvRx_BufferReceive[Local_ChannelIdx]= (u8 *)&(ReceiveBuffer->Data);
 			Uart_prvRx_BufferIndex[Local_ChannelIdx] = ReceiveBuffer->Index;
 			Uart_prvRx_BufferSize[Local_ChannelIdx] = ReceiveBuffer->Size;
 			((USART_t*)ReceiveBuffer->Channel)->CR1 |= USART_Interrupt.RX_DR_Empty;
