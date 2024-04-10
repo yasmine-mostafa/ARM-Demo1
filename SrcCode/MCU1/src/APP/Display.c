@@ -8,6 +8,7 @@
 #include "../../include/HAL/LCD/LCD.h"
 #include "STD_TYPES.h"
 #include "Keypad.h"
+
 #define PERIODICITY 500
 
 #define FIRST_ROW  0
@@ -67,7 +68,7 @@ u8 G_u8MinsBackup;
 u8 G_u8HoursBackup;
 u8 G_u8DaysBackup;
 u8 G_u8MonthsBackup;
-u8 G_u8YearsBackup;
+u32 G_u32YearsBackup;
 
 u8 G_u8EditHours;
 u8 G_u8EditSecs;
@@ -340,9 +341,9 @@ void DisplayTimeMode_Runnable(void)
 				else
 				{
 					G_u8Days = 1;
-				}
+				}*/
 
-			}*/
+			}
 
 			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
 			{
@@ -390,11 +391,11 @@ void DisplayTimeMode_Runnable(void)
 	}
 		if(G_u8DaysBackup==32)
 		{
-			G_u8DaysBackup=1;
-			/*
+
 			if(G_u8Month==2 && (G_u32Years%4 !=0))
 			{
-				if((G_u8CurrCol==UNITS_DIGIT_DAY|G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
+				G_u8DaysBackup=1;
+				/*if((G_u8CurrCol==UNITS_DIGIT_DAY|G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
 				{
 					G_u8DaysBackup=1;
 
@@ -402,9 +403,9 @@ void DisplayTimeMode_Runnable(void)
 				else
 				{
 					G_u8Days = 1;
-				}
+				}*/
 
-			}*/
+			}
 
 			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
 			{
@@ -436,13 +437,13 @@ void DisplayTimeMode_Runnable(void)
 			G_u8Month = 1;
 			if((G_u8CurrCol==UNITS_DIGIT_YEAR|G_u8CurrCol==TENS_DIGIT_YEAR)&&G_u8CurrRow==0)
 			{
-				G_u8YearsBackup++;
+				G_u32YearsBackup++;
 
 			}
 			else
 			{
-				G_u8Years++;
-				G_u8YearsBackup=G_u8Years;
+				G_u32Years++;
+				G_u32YearsBackup=G_u32Years;
 			}
 		}
 		if (G_u8MonthsBackup>12)
@@ -450,13 +451,13 @@ void DisplayTimeMode_Runnable(void)
 			G_u8MonthsBackup = 1;
 			if((G_u8CurrCol==UNITS_DIGIT_YEAR|G_u8CurrCol==TENS_DIGIT_YEAR)&&G_u8CurrRow==0)
 			{
-				G_u8YearsBackup++;
+				G_u32YearsBackup++;
 
 			}
 			else
 			{
-				G_u8Years++;
-				G_u8YearsBackup=G_u8Years;
+				G_u32Years++;
+				G_u32YearsBackup=G_u32Years;
 			}
 		}
 
