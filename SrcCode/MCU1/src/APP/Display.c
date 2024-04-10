@@ -53,7 +53,7 @@ typedef enum
 SelectMode_t G_enuMode;
 
 
-u32 G_u32Years=2023;
+u32 G_u32Years=2024;
 u8 G_u8Month=2;
 u8 G_u8Days=28;
 u8 G_u8hours=23;
@@ -66,9 +66,6 @@ u16 G_u8MSecs;
 u8 G_u8SecondsBackup;
 u8 G_u8MinsBackup;
 u8 G_u8HoursBackup;
-u8 G_u8DaysBackup;
-u8 G_u8MonthsBackup;
-u32 G_u32YearsBackup;
 
 u8 G_u8EditHours;
 u8 G_u8EditSecs;
@@ -79,7 +76,7 @@ u32 G_u32EditYears;
 u8 G_u8EditMode;
 
 u8 G_u8CurrRow=0;
-u8 G_u8CurrCol=4;
+u8 G_u8CurrCol=5;
 u8 G_PressedButton;
 
 
@@ -133,7 +130,7 @@ void DisplayTimeMode_Runnable(void)
 		{
 			LCD_WriteNumberAsynch(G_u8hours);
 		}
-		LCD_WriteStringAsynch(":");
+		LCD_WriteStringAsynch(".");
 		if(G_u8Mins<10)
 		{
 			LCD_WriteNumberAsynch(0);
@@ -144,7 +141,7 @@ void DisplayTimeMode_Runnable(void)
 		{
 			LCD_WriteNumberAsynch(G_u8Mins);
 		}
-		LCD_WriteStringAsynch(":");
+		LCD_WriteStringAsynch(".");
 		if(G_u8Secs<10)
 		{
 			LCD_WriteNumberAsynch(0);
@@ -175,169 +172,88 @@ void DisplayTimeMode_Runnable(void)
 			}*/
 
 		}
-		if(G_u8SecondsBackup==60)
+		if(G_u8SecondsBackup>60)
 		{
 			//G_u8Secs=0;
 			if((G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==1)
 			{
-				if(G_u8MinsBackup<60)
-				{
-					G_u8MinsBackup++;
-				}
-				else
-				{
-					G_u8MinsBackup=0;
-				}
-
+				G_u8MinsBackup++;
 
 			}
 			else
 			{
-				if(G_u8Mins<60)
-				{
-					G_u8Mins++;
-				}
-				else
-				{
-					G_u8Mins=0;
-				}
+				G_u8Mins++;
 				G_u8MinsBackup=G_u8Mins;
 			}
 			G_u8SecondsBackup=0;
 
 
 		}
-		if(G_u8Secs==60)
+		if(G_u8Secs>60)
 		{
 			G_u8Secs=0;
 			if((G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==1)
 			{
-				if(G_u8MinsBackup<60)
-				{
-					G_u8MinsBackup++;
-				}
-				else if(G_u8MinsBackup==60)
-				{
-					G_u8MinsBackup=0;
-					//G_u8Secs=0;
-					G_u8hours++;
+				G_u8MinsBackup++;
 
-				}
 			}
-
 			else
 			{
-
-				if(G_u8Mins<60)
-				{
-					G_u8Mins++;
-				}
-				else if (G_u8Mins==60)
-				{
-					G_u8Mins = 0;
-					/*if(G_u8hours<24)
-					{
-						G_u8hours++;
-					}
-					else if(G_u8hours==24)
-					{
-						G_u8hours=0;
-					}*/
-					if((G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==1)
-					{
-
-						if(G_u8HoursBackup<24)
-						{
-							G_u8HoursBackup++;
-						}
-						else if (G_u8HoursBackup==24)
-						{
-							G_u8HoursBackup=0;
-							G_u8Days++;
-
-						}
-					}
-					else
-					{
-						if(G_u8hours<24)
-						{
-							G_u8hours++;
-						}
-						else if(G_u8hours==24)
-						{
-							G_u8hours=0;
-							if((G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
-							{
-								G_u8DaysBackup++;
-
-							}
-							else
-							{
-								G_u8Days++;
-								G_u8DaysBackup=G_u8Days;
-							}
-						}
-						G_u8HoursBackup=G_u8hours;
-					}
-				}
+				G_u8Mins++;
 				G_u8MinsBackup=G_u8Mins;
 			}
-
 		}
-
-		if (G_u8DaysBackup==29)
+		if(G_u8MinsBackup>60)
 		{
-			if(G_u8Month==2 && (G_u32Years%4 !=0))
+			//G_u8Secs=0;
+			if((G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==1)
 			{
-
-				if((G_u8CurrCol==UNITS_DIGIT_DAY|G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
-				{
-					G_u8DaysBackup=1;
-
-				}
-				else
-				{
-					G_u8Days = 1;
-				}
-
-			}
-			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-			{
-				G_u8MonthsBackup++;
+				G_u8HoursBackup++;
 
 			}
 			else
 			{
-				G_u8Month++;
-				G_u8MonthsBackup=G_u8Month;
+				G_u8hours++;
+				G_u8HoursBackup=G_u8hours;
 			}
+
+			G_u8MinsBackup=0;
+
+		}
+		else
+		{
+
+		}
+		if (G_u8Mins>60)
+		{
+			G_u8Mins = 0;
+			if((G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==1)
+			{
+				G_u8HoursBackup++;
+
+			}
+			else
+			{
+				G_u8hours++;
+				G_u8HoursBackup=G_u8hours;
+			}
+		}
+		if (G_u8HoursBackup>23)
+		{
+			G_u8HoursBackup = 0;
+			G_u8Days++;
+		}
+		if (G_u8hours>23)
+		{
+			G_u8hours = 0;
+			G_u8Days++;
 		}
 		if (G_u8Days==29)
 		{
-			G_u8Days = 1;
-			/*if(G_u8Month==2 && (G_u32Years%4 !=0))
+			if(G_u8Month==2 && (G_u32Years%4 !=0))
 			{
-				if((G_u8CurrCol==UNITS_DIGIT_DAY|G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
-				{
-					G_u8DaysBackup=1;
-
-				}
-				else
-				{
-					G_u8Days = 1;
-				}
-
-			}*/
-
-			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-			{
-				G_u8MonthsBackup++;
-
-			}
-			else
-			{
+				G_u8Days = 1;
 				G_u8Month++;
-				G_u8MonthsBackup=G_u8Month;
 			}
 		}
 		if (G_u8Days==31)
@@ -347,135 +263,20 @@ void DisplayTimeMode_Runnable(void)
 					||G_u8Month==9
 					||G_u8Month==11)
 			{
-				G_u8Days = 1;
-				/*if((G_u8CurrCol==UNITS_DIGIT_DAY|G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
-				{
-					G_u8DaysBackup=1;
-
-				}
-				else
-				{
 					G_u8Days = 1;
-				}*/
-
-			}
-
-			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-			{
-				G_u8MonthsBackup++;
-
-			}
-			else
-			{
-				G_u8Month++;
-				G_u8MonthsBackup=G_u8Month;
-			}
-
-		}
-		if (G_u8DaysBackup==31)
-		{
-			if(		G_u8Month==4
-					||G_u8Month==6
-					||G_u8Month==9
-					||G_u8Month==11)
-			{
-
-				G_u8DaysBackup=1;
-				/*if((G_u8CurrCol==UNITS_DIGIT_DAY|G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
-				{
-					G_u8DaysBackup=1;
-
-				}
-				else
-				{
-					G_u8Days = 1;
-				}*/
-
-			}
-
-			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-			{
-				G_u8MonthsBackup++;
-
-			}
-			else
-			{
-				G_u8Month++;
-				G_u8MonthsBackup=G_u8Month;
-			}
-	}
-		if(G_u8DaysBackup==32)
-		{
-
-			if(G_u8Month==2 && (G_u32Years%4 !=0))
-			{
-				G_u8DaysBackup=1;
-				/*if((G_u8CurrCol==UNITS_DIGIT_DAY|G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
-				{
-					G_u8DaysBackup=1;
-
-				}
-				else
-				{
-					G_u8Days = 1;
-				}*/
-
-			}
-
-			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-			{
-				G_u8MonthsBackup++;
-
-			}
-			else
-			{
-				G_u8Month++;
-				G_u8MonthsBackup=G_u8Month;
+					G_u8Month++;
 			}
 		}
 		if(G_u8Days==32)
 		{
 			G_u8Days = 1;
-			if((G_u8CurrCol==UNITS_DIGIT_MONTH|G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-			{
-				G_u8MonthsBackup++;
-
-			}
-			else
-			{
-				G_u8Month++;
-				G_u8MonthsBackup=G_u8Month;
-			}
+			G_u8Month++;
 		}
-		if (G_u8Month>12)
+		if (G_u8Month==13)
 		{
 			G_u8Month = 1;
-			if((G_u8CurrCol==UNITS_DIGIT_YEAR|G_u8CurrCol==TENS_DIGIT_YEAR)&&G_u8CurrRow==0)
-			{
-				G_u32YearsBackup++;
-
-			}
-			else
-			{
-				G_u32Years++;
-				G_u32YearsBackup=G_u32Years;
-			}
+			G_u32Years++;
 		}
-		if (G_u8MonthsBackup>12)
-		{
-			G_u8MonthsBackup = 1;
-			if((G_u8CurrCol==UNITS_DIGIT_YEAR|G_u8CurrCol==TENS_DIGIT_YEAR)&&G_u8CurrRow==0)
-			{
-				G_u32YearsBackup++;
-
-			}
-			else
-			{
-				G_u32Years++;
-				G_u32YearsBackup=G_u32Years;
-			}
-		}
-
 
 	}
 	G_u8EditMode=1;
@@ -655,3 +456,5 @@ void Edit_Runnable(void)
 	}
 
 }
+
+
