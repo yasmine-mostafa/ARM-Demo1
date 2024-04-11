@@ -8,7 +8,6 @@
 #include "../../include/HAL/LCD/LCD.h"
 #include "STD_TYPES.h"
 #include "Keypad.h"
-
 #define PERIODICITY 500
 
 #define FIRST_ROW  0
@@ -86,7 +85,7 @@ u8 G_PressedButton;
 
 u8 G_CurrentCursor;
 
-
+u8 G_u8ExitFlag=0;
 void DisplayTimeMode_Runnable(void)
 {
 	if(G_enuMode==DISPLAY_MODE)
@@ -122,6 +121,43 @@ void DisplayTimeMode_Runnable(void)
 		LCD_WriteNumberAsynch(G_u32Years);
 		LCD_SetCursorPositionAsynch(1,0);
 		LCD_WriteStringAsynch("TIME:");
+
+
+		if((G_u8CurrCol==UNITS_DIGIT_SECS||G_u8CurrCol==TENS_DIGIT_SECS)&&G_u8CurrRow==1)
+		{
+			G_u8SecondsBackup=G_u8Secs;
+
+		}
+
+
+		else if((G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
+		{
+			G_u8MonthsBackup=G_u8Month;
+		}
+
+		else if((G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
+		{
+			G_u8DaysBackup=G_u8Days;
+		}
+
+		else if((G_u8CurrCol==UNITS_DIGIT_YEAR||G_u8CurrCol==TENS_DIGIT_YEAR||G_u8CurrCol==HUNDEREDS_DIGIT_YEAR
+				||G_u8CurrCol==THOUSANDS_DIGIT_YEAR)&&G_u8CurrRow==1)
+		{
+			G_u32YearsBackup=G_u32Years;
+
+		}
+
+
+		else if((G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==1)
+		{
+			G_u8MinsBackup=G_u8Mins;
+		}
+
+		else if((G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==1)
+		{
+			G_u8HoursBackup=G_u8hours;
+		}
+
 		if(G_u8hours<10)
 		{
 			LCD_WriteNumberAsynch(0);
@@ -164,7 +200,6 @@ void DisplayTimeMode_Runnable(void)
 			else
 			{
 				G_u8Secs++;
-				G_u8SecondsBackup=G_u8Secs;
 				G_u8MSecs=0;
 
 			}
@@ -173,40 +208,6 @@ void DisplayTimeMode_Runnable(void)
 				G_u8Secs=G_u8EditSecs;
 			}*/
 
-		}
-		if((G_u8CurrCol==UNITS_DIGIT_SECS||G_u8CurrCol==TENS_DIGIT_SECS)&&G_u8CurrRow==1)
-		{
-			G_u8SecondsBackup=G_u8Secs;
-
-		}
-
-
-		else if((G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==1)
-		{
-			G_u8MonthsBackup=G_u8Month;
-		}
-
-		else if((G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==1)
-		{
-			G_u8DaysBackup=G_u8Days;
-		}
-
-		if((G_u8CurrCol==UNITS_DIGIT_YEAR||G_u8CurrCol==TENS_DIGIT_YEAR||G_u8CurrCol==HUNDEREDS_DIGIT_YEAR
-				||G_u8CurrCol==THOUSANDS_DIGIT_YEAR)&&G_u8CurrRow==1)
-		{
-			G_u32YearsBackup=G_u32Years;
-
-		}
-
-
-		else if((G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==1)
-		{
-			G_u8MinsBackup=G_u8Mins;
-		}
-
-		else if((G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==1)
-		{
-			G_u8HoursBackup=G_u8hours;
 		}
 
 		if(G_u8SecondsBackup==60&&(G_u8CurrCol==UNITS_DIGIT_SECS||G_u8CurrCol==TENS_DIGIT_SECS)&&G_u8CurrRow==1)
@@ -226,12 +227,17 @@ void DisplayTimeMode_Runnable(void)
 			}
 			else
 			{
-				G_u8Mins++;
+				if (!(G_u8SecondsBackup==60&&(G_u8CurrCol==UNITS_DIGIT_SECS||G_u8CurrCol==TENS_DIGIT_SECS)&&G_u8CurrRow==1))
+				{
+					G_u8Mins++;
+				}
+
 			}
 		}
 		if(G_u8MinsBackup==60&&(G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==1)
 		{
 			G_u8MinsBackup=0;
+
 			G_u8hours++;
 
 		}
@@ -245,8 +251,18 @@ void DisplayTimeMode_Runnable(void)
 			}
 			else
 			{
-				G_u8hours++;
+				if(!(G_u8Mins>=59&&(G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==1))
+				{
+					G_u8hours++;
+				}
+
 			}
+		}
+		if (G_u8HoursBackup==24&&((G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==0))
+		{
+
+			    G_u8HoursBackup=0;
+				G_u8Days++;
 		}
 
 		if (G_u8hours==24)
@@ -259,16 +275,22 @@ void DisplayTimeMode_Runnable(void)
 			}
 			else
 			{
-				G_u8Days++;
-				G_u8DaysBackup=G_u8Days;
+				if(!(G_u8HoursBackup==24&&(G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==0))
+				{
+					G_u8Days++;
+				}
+
 			}
 		}
 
-		if (G_u8HoursBackup==24&&((G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==0))
+		if (G_u8DaysBackup==29&&(G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
 		{
 
-			    G_u8HoursBackup=0;
-				G_u8Days++;
+			if(G_u8Month==2 && (G_u32Years%4 !=0))
+			{
+				G_u8DaysBackup = 1;
+				G_u8Month++;
+			}
 		}
 
 		if (G_u8Days==29)
@@ -287,32 +309,16 @@ void DisplayTimeMode_Runnable(void)
 				}
 			}
 		}
-		if (G_u8DaysBackup==29&&(G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
-		{
 
 
-			if(G_u8Month==2 && (G_u32Years%4 !=0))
-			{
-				G_u8DaysBackup = 1;
-				G_u8Month++;
-			}
-		}
 
-
-		if (G_u8DaysBackup==30)
+		if (G_u8DaysBackup==30&&(G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==0)
 		{
 			if(G_u8Month==2 && (G_u32Years%4 ==0))
 			{
 				G_u8DaysBackup = 1;
-				if((G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-				{
-					G_u8MonthsBackup++;
 
-				}
-				else
-				{
-					G_u8Month++;
-				}
+				G_u8Month++;
 			}
 
 		}
@@ -389,6 +395,12 @@ void DisplayTimeMode_Runnable(void)
 			}
 
 		}
+		if (G_u8MonthsBackup>12&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
+		{
+			G_u8MonthsBackup = 1;
+			G_u32Years++;
+		}
+
 
 		if (G_u8Month>12)
 		{
@@ -409,11 +421,6 @@ void DisplayTimeMode_Runnable(void)
 
 		}
 
-		if (G_u8MonthsBackup>12&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==0)
-		{
-			G_u8MonthsBackup = 1;
-			G_u32Years++;
-		}
 
 
 
@@ -503,7 +510,7 @@ void Edit_Runnable(void)
 						G_u8EditMonth++;
 
 					}
-					else if(G_u8CurrCol<UNITS_DIGIT_YEAR+1&&G_u8CurrCol>THOUSANDS_DIGIT_YEAR-1&&G_u32EditYears<2024)
+					else if(G_u8CurrCol<UNITS_DIGIT_YEAR+1&&G_u8CurrCol>THOUSANDS_DIGIT_YEAR-1)
 					{
 						G_u32EditYears++;
 
@@ -544,13 +551,13 @@ void Edit_Runnable(void)
 				case FIRST_ROW:
 					if((G_u8CurrCol==TENS_DIGIT_DAY||G_u8CurrCol==UNITS_DIGIT_DAY)&&G_u8EditDays<31)
 					{
-						G_u8EditDays++;
+						G_u8EditDays--;
 
 
 					}
 					else if((G_u8CurrCol==TENS_DIGIT_MONTH||G_u8CurrCol==UNITS_DIGIT_MONTH)&&G_u8EditMonth<12)
 					{
-						G_u8EditMonth++;
+						G_u8EditMonth--;
 
 					}
 					else if(G_u8CurrCol<UNITS_DIGIT_YEAR+1&&G_u8CurrCol>THOUSANDS_DIGIT_YEAR-1&&G_u32EditYears<2024)
