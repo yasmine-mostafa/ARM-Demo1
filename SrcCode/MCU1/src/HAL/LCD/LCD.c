@@ -5,6 +5,7 @@
  *      Author: Yasmine Mostafa
  */
 
+
 /****************************************************************************************
  *                        	              Includes                                      *
  ****************************************************************************************/
@@ -82,7 +83,7 @@ typedef struct
 
 typedef struct
 {
-    s16* Str;  ///For Write String Request
+    u8* Str;  ///For Write String Request
 	u32 Num; ///for Write NumRequest
 	LCD_ReqType_t Type;
 	LCD_Position_t Position; //for set cursor request
@@ -146,7 +147,7 @@ Error_t LCD_InitAsynch(void)
 	return Ret_LCDErrorStatus;
 }
 
-Error_t LCD_WriteStringAsynch(s16 * Copy_Str)
+Error_t LCD_WriteStringAsynch(u8 * Copy_Str)
 {
 	Error_t Ret_LCDErrorStatus = Error_NOK;
 
