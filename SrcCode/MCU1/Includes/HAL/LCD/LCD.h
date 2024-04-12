@@ -94,7 +94,7 @@ Error_t LCD_SetCursorPositionAsynch(u8 Row, u8 Column);
  *@param  : Pointer to String.
  *@return : Error State.
  */
-Error_t LCD_WriteStringAsynch(s16 * Str);
+Error_t LCD_WriteStringAsynch(u8 * Str);
 /**
  *@brief  : Function to Write Number on Screen.
  *@param  : Number to be Written.
