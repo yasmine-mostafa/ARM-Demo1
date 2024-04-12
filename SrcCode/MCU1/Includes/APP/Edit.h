@@ -22,8 +22,8 @@ typedef enum
 
 typedef enum
 {
-	EditON,
-	EditOFF
+	EditOFF,
+	EditON
 }EditState_t;
 
 
