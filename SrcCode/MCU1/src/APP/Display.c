@@ -535,7 +535,7 @@ void Edit_Action(void)
 			}
 			break;
 		case OK:
-			G_enuEditMode=EditOFF;
+			//G_enuEditMode=EditOFF;
 			G_u8SecsFlag=0;
 			G_u8HoursFlag=0;
 			G_u8MinsFlag=0;
