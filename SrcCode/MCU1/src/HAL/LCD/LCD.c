@@ -10,7 +10,6 @@
  ****************************************************************************************/
 
 #include "Error.h"
-#include "STD_Types.h"
 #include "GPIO.h"
 #include "LCD.h"
 #include "LCD_CFG.h"
@@ -83,7 +82,7 @@ typedef struct
 
 typedef struct
 {
-    u8* Str;  ///For Write String Request
+    s16* Str;  ///For Write String Request
 	u32 Num; ///for Write NumRequest
 	LCD_ReqType_t Type;
 	LCD_Position_t Position; //for set cursor request
@@ -147,7 +146,7 @@ Error_t LCD_InitAsynch(void)
 	return Ret_LCDErrorStatus;
 }
 
-Error_t LCD_WriteStringAsynch(u8 * Copy_Str)
+Error_t LCD_WriteStringAsynch(s16 * Copy_Str)
 {
 	Error_t Ret_LCDErrorStatus = Error_NOK;
 
