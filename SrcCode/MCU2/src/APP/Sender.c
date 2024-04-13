@@ -18,7 +18,9 @@ void Sender_RunnableFunc(void)
     if(Local_Key!=0)
     {
         tx1_buff.Data=&Local_Key;
-        USART_SendBufferZeroCopy(&tx1_buff);
+        USART_SendByteSynchByTime(USART1,Local_Key);
+        //USART_SendBufferZeroCopy(&tx1_buff);
+        Local_Key=0;
     }
     else
     {

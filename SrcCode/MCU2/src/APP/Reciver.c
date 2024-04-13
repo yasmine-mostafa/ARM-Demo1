@@ -19,9 +19,11 @@ RecType_tstr ReceiveType={.Mode=NORMAL_MODE,.NormalModeOperation=NO_ACTION,.Stop
 void Receive_RunnableFunc(void)
 {
     static u8 Local_Count=0;
+    u8 Loc_ReceiveValue ;
 
-    USART_ReceiveBufferAsynchronous(&rx_buff);
-    switch ((u8)(rx_buff.Data)) {
+    //USART_ReceiveBufferAsynchronous(&rx_buff);
+    USART_ReceiveByteSynchByTime(USART1,&Loc_ReceiveValue);
+    switch (Loc_ReceiveValue) {
     case 'M': /*  Mode */
         ReceiveType.Mode ^= 1; // Toggle Mode
         break;
@@ -143,7 +145,8 @@ void Receive_RunnableFunc(void)
         break;
     }
    /*  ِِِِِِِِUSART_SendByteAsynchronous(USART1,(u8)(rx_buff.Data)); *//*check*/
-    rx_buff.Data=NULL;
+   //USART_SendByteSynchByTime(USART1,Loc_ReceiveValue);
+    Loc_ReceiveValue=NULL;
     
 
    

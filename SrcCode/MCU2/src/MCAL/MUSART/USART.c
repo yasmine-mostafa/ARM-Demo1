@@ -26,7 +26,7 @@ typedef struct {
 #define USART_ENABLE_BIT     13         // Bit position for USART enable control
 #define PARITY_CONTROL_BIT   10         // Bit position for parity control
 #define PARITY_SELECTION_BIT 9         // Bit position for parity selection
-#define TX_DATA_EMPTY_BIT    7          // Bit position for transmitter data empty interrupt enable
+#define TX_DATA_EMPTY_BIT     7          // Bit position for transmitter data empty interrupt enable
 #define TRANSMIT_COMPLETE_BIT 6         // Bit position for transmit complete interrupt enable
 #define RX_DATA_NOT_EMPTY_BIT 5         // Bit position for receiver data not empty interrupt enable
 #define TX_ENABLE_BIT        3          // Bit position for transmitter enable control
@@ -247,7 +247,7 @@ USART_enuErrorStatus USART_SendBytesynchronous(void* Channel, u8 Copy_Data)
 
 		((USART_t*)Channel)->DR=Copy_Data;
 
-		while (((((USART_t*)Channel)->SR >> 6)&0x1)== 0);
+		while (((((USART_t*)Channel)->SR >> TRANSMIT_COMPLETE_BIT)&0x1)== 0);
 		
 		Local_ErrorStatus=LBTY_OK;
 
@@ -256,6 +256,28 @@ USART_enuErrorStatus USART_SendBytesynchronous(void* Channel, u8 Copy_Data)
 	 return Local_ErrorStatus; 
 }
 /***************************************************************************************************/
+USART_enuErrorStatus USART_SendByteSynchByTime(void *Channel, u8 Copy_Data)
+{
+	USART_enuErrorStatus Local_ErrorStatus = USART_OK;
+	
+	if(Channel==NULL)
+	{
+		Local_ErrorStatus=USART_NullConfPointer;
+	}
+
+	else
+	{
+		if(((((USART_t*)Channel)->SR >> TX_DATA_EMPTY_BIT)&0x1)== 1)
+		{
+			((USART_t*)Channel)->DR=Copy_Data;
+		}
+
+	}
+
+	 return Local_ErrorStatus; 
+
+}
+/****************************************************************************************************/
 USART_enuErrorStatus USART_ReceiveBytesynchronous(void* Channel, u8 * Copy_Data)
 {
 	USART_enuErrorStatus Local_ErrorStatus = USART_OK;
@@ -268,7 +290,7 @@ USART_enuErrorStatus USART_ReceiveBytesynchronous(void* Channel, u8 * Copy_Data)
 	else
 	{
 
-		while (((((USART_t*)Channel)->SR >> 5)&0x1)== 0);
+		while (((((USART_t*)Channel)->SR >> RX_DATA_NOT_EMPTY_BIT)&0x1)== 0);
 		*Copy_Data=((USART_t*)Channel)->DR;
 		
 
@@ -279,6 +301,30 @@ USART_enuErrorStatus USART_ReceiveBytesynchronous(void* Channel, u8 * Copy_Data)
 }
 
 /***************************************************************************************************/
+USART_enuErrorStatus USART_ReceiveByteSynchByTime(void *Channel, u8 *Copy_Data)
+{
+		USART_enuErrorStatus Local_ErrorStatus = USART_OK;
+			
+	if(Channel==NULL)
+	{
+		Local_ErrorStatus=USART_NullConfPointer;
+	}
+
+	else
+	{
+
+		if(((((USART_t*)Channel)->SR >> RX_DATA_NOT_EMPTY_BIT)&0x1)== 1)
+		{
+			*Copy_Data=((USART_t*)Channel)->DR;
+		}
+
+		
+
+	}
+
+	 return Local_ErrorStatus; 
+}
+/****************************************************************************************************/
 USART_enuErrorStatus USART_SendByteAsynchronous(void* Channel, u8 Copy_Data)
 {
 	USART_enuErrorStatus Local_ErrorStatus = USART_OK;
