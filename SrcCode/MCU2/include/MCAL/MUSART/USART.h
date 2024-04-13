@@ -203,6 +203,8 @@ USART_enuErrorStatus USART_SendBufferZeroCopy(USART_TXBuffer *Copy_ConfigBuffer)
 USART_enuErrorStatus USART_RegisterCallBackFunction(USART_Mode Mode, CallBack CallBackFunction);
 
 
+USART_enuErrorStatus USART_SendByteSynchByTime(void *Channel, u8 Copy_Data);
 
+USART_enuErrorStatus USART_ReceiveByteSynchByTime(void *Channel, u8 *Copy_Data);
 
 #endif //MCAL_MUSART_USART_H_
