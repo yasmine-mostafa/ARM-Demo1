@@ -455,14 +455,10 @@ void DisplayTimeMode_Runnable(void)
 		}
 
 	}
-	if(G_u8EditOn_flag==0)
-	{
-		KEYPAD_voidGetPressedKey(&G_enuEditMode);
-	}
 
 	if(G_enuEditMode==EditON)
 	{
-		G_u8EditOn_flag=1;
+		//G_u8EditOn_flag=1;
 		Edit_Action();
 
 	}
@@ -487,7 +483,7 @@ void Edit_Action(void)
 	Loc_u8EditMins=G_u8Mins;
 
 	LCD_SetCursorPositionAsynch(G_u8CurrRow,G_u8CurrCol);
-	KEYPAD_voidGetPressedKey(&G_enuEditControl);
+	//KEYPAD_voidGetPressedKey(&G_enuEditControl);
 	switch(G_enuEditControl)
 	{
 		case DOWN_ARROW:
@@ -535,14 +531,14 @@ void Edit_Action(void)
 			}
 			break;
 		case OK:
-			//G_enuEditMode=EditOFF;
+			G_enuEditMode=EditOFF;
 			G_u8SecsFlag=0;
 			G_u8HoursFlag=0;
 			G_u8MinsFlag=0;
 			G_u8HDaysFlag=0;
 			G_u8MonthsFlag=0;
 			G_uYearsFlag=0;
-			G_u8EditOn_flag=0;
+			//G_u8EditOn_flag=0;
 			break;
 		case DECREASE_BUTTON:
 			switch(G_u8CurrRow)
