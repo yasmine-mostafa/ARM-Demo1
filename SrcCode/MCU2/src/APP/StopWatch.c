@@ -17,6 +17,7 @@ extern RecType_tstr ReceiveType;
 
 void Stopwatch_Runnable(void)
 {
+    static u8 StopWatch_Flag = STOP_WATCH_MODE_ACTION_START;
     
     static u8 Stopwatch_On=0;
     static Stopwatch_Time SW_Time={0,0,0,0};

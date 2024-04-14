@@ -119,13 +119,17 @@ void Receive_RunnableFunc(void)
                 break;
             case 2:
                 ReceiveType.StopWatchOperation=STOP_WATCH_MODE_ACTION_PAUSE;
+
                 break;            
-            default:
             case 0:
                 ReceiveType.StopWatchOperation=STOP_WATCH_MODE_ACTION_CONTINUE;
-                break;                    
+                Local_Count++;
+                break;
+            default:
+                break;                        
             }
             Local_Count++;
+
         }
         else
         {
@@ -136,6 +140,8 @@ void Receive_RunnableFunc(void)
         if(ReceiveType.Mode==STOP_WATCH_MODE)
         {
             ReceiveType.StopWatchOperation=STOP_WATCH_MODE_ACTION_STOP;
+            Local_Count=1;
+
         }
         break;
     default:
