@@ -9,11 +9,11 @@
 #include "HKPD/KYD.h"
 #include "MUSART/USART.h"
 
-
-
+//extern USART_RXBuffer rx_buff;
 
 int main()
 {
+    u8 Loc_Smile[8]=HCLCD_SMILY_FACE;
     MRCC_ControlClockAHP1Peripheral(RCC_AHB1_GPIOA,RCC_ENABLE);
     MRCC_ControlClockAHP1Peripheral(RCC_AHB1_GPIOB,RCC_ENABLE);
     MRCC_ControlClockABP2Peripheral(RCC_APB2_USART1,RCC_ENABLE);
@@ -53,9 +53,12 @@ int main()
 	MGPIO_InitPinAF(&TX_PIN);
 	MGPIO_InitPinAF(&RX_PIN);
     CLCD_InitAsynch();
+    CLCD_WriteSpecialCharAsynch(&Loc_Smile,1);
     KPD_INIT();
+    //HLED_Init();
 	USART_Init(&Usart1_Config);
-	//USART_RegisterCallBackFunction(UART1_RECEIVE,recieve_callback);
+    //USART_ReceiveBufferAsynchronous(&rx_buff);
+	//USART_RegisterCallBackFunction(UART1_RECEIVE,Receive_RunnableFunc);
     Sched_Init();
     StartSched();
 	

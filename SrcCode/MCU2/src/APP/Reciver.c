@@ -1,8 +1,6 @@
 #include "APP/Receiver.h"
 
 
-
-
 USART_RXBuffer rx_buff = 
 {
     .Channel = USART1,
@@ -11,19 +9,18 @@ USART_RXBuffer rx_buff =
     .Index = 0
 };
 
-
 RecType_tstr ReceiveType={.Mode=NORMAL_MODE,.NormalModeOperation=NO_ACTION,.StopWatchOperation=NO_ACTION,.NormalModeEdit=NO_ACTION};
 
 
 
 void Receive_RunnableFunc(void)
 {
-    static u8 Local_Count=0;
+    static u8 Local_Count=1;
     u8 Loc_ReceiveValue ;
 
-    //USART_ReceiveBufferAsynchronous(&rx_buff);
-    USART_ReceiveByteSynchByTime(USART1,&Loc_ReceiveValue);
-    switch (Loc_ReceiveValue) {
+    USART_ReceiveBufferAsynchronous(&rx_buff);
+   // USART_ReceiveByteSynchByTime(USART1,&Loc_ReceiveValue);
+    switch (((u8)rx_buff.Data)) {
     case 'M': /*  Mode */
         ReceiveType.Mode ^= 1; // Toggle Mode
         break;
@@ -117,14 +114,14 @@ void Receive_RunnableFunc(void)
             Local_Count%=3;
             switch (Local_Count)
             {
-            case 0:
+            case 1:
                 ReceiveType.StopWatchOperation=STOP_WATCH_MODE_ACTION_START;
                 break;
-            case 1:
+            case 2:
                 ReceiveType.StopWatchOperation=STOP_WATCH_MODE_ACTION_PAUSE;
                 break;            
             default:
-            case 2:
+            case 0:
                 ReceiveType.StopWatchOperation=STOP_WATCH_MODE_ACTION_CONTINUE;
                 break;                    
             }
@@ -144,9 +141,11 @@ void Receive_RunnableFunc(void)
     default:
         break;
     }
-   /*  ِِِِِِِِUSART_SendByteAsynchronous(USART1,(u8)(rx_buff.Data)); *//*check*/
+
+
+    //USART_SendByteAsynchronous(USART1,((u8)rx_buff.Data));
    //USART_SendByteSynchByTime(USART1,Loc_ReceiveValue);
-    Loc_ReceiveValue=NULL;
+    rx_buff.Data=NULL;
     
 
    
