@@ -4,7 +4,7 @@
 #include "MNVIC/MNVIC.h"
 #include "HLED/LED.h"
 #include "HSWITCH/SWITCH.h"
-#include "SERVICE/SCHED/SCHED.h"
+#include "SERVICE/SCHED/Scheduler.h"
 #include "HCLCD/LCD.h"
 #include "HKPD/KYD.h"
 #include "MUSART/USART.h"
@@ -59,8 +59,8 @@ int main()
 	USART_Init(&Usart1_Config);
     //USART_ReceiveBufferAsynchronous(&rx_buff);
 	//USART_RegisterCallBackFunction(UART1_RECEIVE,Receive_RunnableFunc);
-    Sched_Init();
-    StartSched();
+    Sched_init();
+    Sched_Start();
 	
 
 
