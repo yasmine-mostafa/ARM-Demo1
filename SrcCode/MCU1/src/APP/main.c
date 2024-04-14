@@ -69,18 +69,17 @@
 #include "LCD.h"
 #include "USART.h"
 #include "Keypad.h"
-
-
+#include "HUSART.h"
 
 int
 main(void)
 {
-	RCC_EnablePeripheral(Bus_AHB1,PERIPHERAL_GPIOA);
+	//RCC_EnablePeripheral(Bus_AHB1,PERIPHERAL_GPIOA);
 	RCC_EnablePeripheral(Bus_AHB1,PERIPHERAL_GPIOB);
-	RCC_EnablePeripheral(Bus_APB2,PERIPHERAL_USART1);
+	//RCC_EnablePeripheral(Bus_APB2,PERIPHERAL_USART1);
 
 
-
+/*
 	GPIO_Config_t GPIO_UART_TX=
 	{
 			.Port=GPIO_PORTA,
@@ -97,7 +96,7 @@ main(void)
 			. Speed = GPIO_SPEED_HIGH,
 	};
 
-	USART_strCfg_t USART_Config =
+/*	USART_strCfg_t USART_Config =
 	{
 			.pUartInstance=USART1,
 			.Stop_bits=USART_1StopBit,
@@ -111,31 +110,38 @@ main(void)
 			.UartEnable=USART_Enable,
 			.BaudRate=9600,
 			.Oversampling=OVERSAMPLING_16
+	};*/
+
+
+	USART_Config_t USART_Config=
+	{
+		.USART_ID=USART1,
+		.BaudRate=9600,
+		.OverSampling=OVERSAMPLING_16,
+		.WordLength=WORD_LENGTH_8,
+		.ParityEnable=PARITY_DISABLED,
+		.StopBits=STOP_BITS_1
 	};
 
-
-
+/*
 	GPIO_InitPinAF(&GPIO_UART_TX,GPIO_AF_USART1_2);
 	GPIO_InitPinAF(&GPIO_UART_RX,GPIO_AF_USART1_2);
 
-	USART_Init(&USART_Config);
+	USART_Init(USART_Config);*/
+	HUSART_Init(USART_Config);
 
-	STK_Init(CLK_AHB,MODE_ENABLE_INT);
+	//STK_Init(CLK_AHB,MODE_ENABLE_INT);
 
 	LCD_InitAsynch();
 
-	//LED_Init();
-	//SWITCH_Init();
+	LED_Init();
+	KEYPAD_Init();
 
-	NVIC_EnableIRQ(IRQ_USART1);
 
+	LED_Init();
 	SCHED_Init();
+	//NVIC_EnableIRQ(IRQ_USART1);
 	SCHED_Start();
-
-
-
-
-
 }
 
 //#pragma GCC diagnostic pop

@@ -15,6 +15,10 @@
 #include "Mode.h"
 #include "Edit.h"
 #include "StopWatch.h"
+#include "GPIO.h"
+#include "LED_CFG.h"
+#include"LED.h"
+#include "HUSART.h"
 
 /****************************************************************************************
  *                        	              Defines                                       *
@@ -28,36 +32,28 @@
  *                        	            Variables                                     *
  ****************************************************************************************/
 
-USART_RXBuffer USART_RX=
-{
-		.Channel=USART1,
-		.Data=NULL,
-		.Size=1,
-		.Index=0,
-};
+
 
 EditState_t G_enuEdit_flag=EditOFF;
 SelectMode_t G_enuMode= DISPLAY_MODE;
 EditPressedButton_t G_enuEditControl=No_Action;
 StopWatchControl_t G_enuStopWatchControl=No_Action;
 
+u8 key[1]="X";
+void ReceiveCB(void);
 
-/****************************************************************************************
- *                        	              Runnable Implementation                   *
- ****************************************************************************************/
+USART_ReqBuffer_t USART_RX=
+{
+		.Channel=USART1,
+		.Data=key,
+		.Size=1,
+		.cbf=ReceiveCB
+};
 
-/**
- *@brief  : Receive the pressed key over UART and update states.
- *@periodicity:
- */
-void ReceiveData_Runnable(void)
+void ReceiveCB(void)
 {
 	static u8 Loc_StopWatchCount=START;
-
-	USART_ReceiveBufferAsynchronous(&USART_RX);
-	u8* Loc_ReceivedKey=&(USART_RX.Data);
-
-	switch(*Loc_ReceivedKey)
+	switch(*(USART_RX.Data))
 	{
 	/*Change mode*/
 	case 'M':
@@ -173,7 +169,21 @@ void ReceiveData_Runnable(void)
 		break;
 
 	}
-   USART_RX.Data=NULL;
+
+}
+
+/****************************************************************************************
+ *                        	              Runnable Implementation                   *
+ ****************************************************************************************/
+
+/**
+ *@brief  : Receive the pressed key over UART and update states.
+ *@periodicity:
+ */
+void ReceiveData_Runnable(void)
+{
+//	USART_ReceiveBufferZeroCopy(USART_RX);
+	HUSART_ReceiveBufferZC(USART_RX);
 }
 
 
