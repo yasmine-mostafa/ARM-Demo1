@@ -72,6 +72,7 @@ Time.Second+=DISPLAY_PERIODICITY;
 
 if(ReceiveType.Mode==NORMAL_MODE)
 {
+    
     CLCD_ClearScreenAsynch();
     CLCD_WriteStringAsynch("DATE:",5);
     /*year*/
@@ -126,6 +127,17 @@ if(ReceiveType.Mode==NORMAL_MODE)
         CLCD_WriteNumberAsynch(0);
     }
     CLCD_WriteNumberAsynch(Time.Second);
+    CLCD_DisplaySpecialCharAsynch(1);
+    if(ReceiveType.NormalModeEdit==NORMAL_MODE_EDIT)
+    {
+        Diplay_EditHlp();
+        ReceiveType.NormalModeOperation=NO_ACTION;
+    }   
+    else
+    {
+        /*Do Nothing*/
+    }
+    
     if(Time.Second>59)
     {
         Time.Second=0;
@@ -141,7 +153,7 @@ if(ReceiveType.Mode==NORMAL_MODE)
         Time.Hour=0;
         Date.Day++;
     }
-    if(Date.Day==28&&Date.Month==2)
+    if(Date.Day==29&&Date.Month==2)
     {
         if(!(Date.Year % 4 == 0 && (Date.Year % 100 != 0 || Date.Year % 400 == 0)))
         {
@@ -154,9 +166,9 @@ if(ReceiveType.Mode==NORMAL_MODE)
         }
 
     }
-    else if (Date.Day==29&&Date.Month==2)
+    else if (Date.Day==30&&Date.Month==2)
     {
-        if(!(Date.Year % 4 == 0 && (Date.Year % 100 != 0 || Date.Year % 400 == 0)))
+        if((Date.Year % 4 == 0 && (Date.Year % 100 != 0 || Date.Year % 400 == 0)))
         {
             Date.Day=1;
             Date.Month++;
@@ -166,12 +178,12 @@ if(ReceiveType.Mode==NORMAL_MODE)
             /*Do Nothing*/
         }
     }
-    else if (Date.Day==30&&(IS_MONTH_30_DAY(Date.Month)))
+    else if (Date.Day==31&&(IS_MONTH_30_DAY(Date.Month)))
     {
         Date.Day=1;
         Date.Month++;
     }
-    else if (((Date.Day==31)&&(IS_MONTH_31_DAY(Date.Month)))||Date.Day>31)
+    else if (((Date.Day==32)&&(IS_MONTH_31_DAY(Date.Month)))||Date.Day>31)
     {
         Date.Day=1;
         Date.Month++;
@@ -181,18 +193,7 @@ if(ReceiveType.Mode==NORMAL_MODE)
         Date.Month=1;
         Date.Year++;
     }
-    if(ReceiveType.NormalModeEdit==NORMAL_MODE_EDIT)
-    {
-        Diplay_EditHlp();
-        ReceiveType.NormalModeOperation=NO_ACTION;
 
-       
-
-    }   
-    else
-    {
-        /*Do Nothing*/
-    }
 }
 else 
 {
