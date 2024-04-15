@@ -25,6 +25,8 @@
 #define DAY_SECOND_DIGIT               (u8)(MONTH_FIRST_DIGIT+2)
 #define DAY_FIRST_DIGIT                (u8)(DAY_SECOND_DIGIT+1) 
 
+#define EDIT                           1
+#define NO_EDIT                        0
 
 
 
@@ -33,6 +35,10 @@ typedef struct
    u16 Year;
    u8 Month;
    u8 Day;
+   u8 EditingYear;
+   u8 EditingMonth;
+   u8 EditingDay;
+
 
 }Date_tstr;
 
@@ -42,6 +48,9 @@ typedef struct
    u8 Minuts;
    u8 Second;
    u8 MiliSecond;
+   u8 EditingHour;
+   u8 EditingMinute;
+   u8 EditingSecond;
 
 }Time_tstr;
 
@@ -54,6 +63,9 @@ static Time_tstr Time=
     .Minuts=59,
     .Second=50,
     .MiliSecond=2,
+    .EditingSecond=NO_EDIT,
+    .EditingMinute=NO_EDIT,
+    .EditingHour=NO_EDIT,
         
 };
 static Date_tstr Date=
@@ -61,34 +73,66 @@ static Date_tstr Date=
     .Year=2024,
     .Month=12,
     .Day=30,
+    .EditingDay=NO_EDIT,
+    .EditingMonth=NO_EDIT,
+    .EditingYear=NO_EDIT,
         
 };
 
 void DisplayDateTime(void)
 {
 
+if(Time.EditingSecond==NO_EDIT)
+{
+    Time.Second+=DISPLAY_PERIODICITY;
+}
+else
+{
+    /* do nothing */
+}
 
-Time.Second+=DISPLAY_PERIODICITY;
 
 if(ReceiveType.Mode==NORMAL_MODE)
 {
+    if(ReceiveType.NormalModeOperation==EDIT_MODE_OK)
+    {
+        Time.EditingHour=NO_EDIT;
+        Time.EditingMinute=NO_EDIT;
+        Time.EditingSecond=NO_EDIT;
+        Date.EditingDay=NO_EDIT;
+        Date.EditingMonth=NO_EDIT;
+        Date.EditingYear=NO_EDIT;
+    }
     
 
     if(Time.Second>59)
     {
         Time.Second-=59;
-        Time.Minuts++;
+        if (Time.EditingMinute==NO_EDIT)
+        {
+            Time.Minuts++;
+        }
+        
+        
     }
     if (Time.Minuts>59)
     {
         Time.Minuts-=59;
-        Time.Hour++;
+        if (Time.EditingHour==NO_EDIT)
+        {
+            Time.Hour++;
+        }
+        
     }
     if(Time.Hour>23)
     {
         Time.Hour=0;
         //Time.Hour-=23;
-        Date.Day++;
+        if(Date.EditingDay==NO_EDIT)
+        {
+            Date.Day++;
+        }
+       
     }
     if (Date.Month == 2) // If the month is February
     {
@@ -98,13 +142,20 @@ if(ReceiveType.Mode==NORMAL_MODE)
             {
                 Date.Day=1;
                 //Date.Day -= 28; // Adjust the day
-                Date.Month++;   // Move to the next month
+                if (Date.Month==NO_EDIT)
+                {
+                    Date.Month++;   // Move to the next month
+                }
+                
             }
             else if (Date.Day > 29) // If the day is greater than 29 in a leap year
             {
                 Date.Day=1;
                 //Date.Day -= 29; // Adjust the day
-                Date.Month++;   // Move to the next month
+                if (Date.Month==NO_EDIT)
+                {
+                    Date.Month++;   // Move to the next month
+                }
             }
         }
     }
@@ -112,19 +163,30 @@ if(ReceiveType.Mode==NORMAL_MODE)
     {
         Date.Day=1;
         //Date.Day-=30;
-        Date.Month++;
+       if(Date.EditingMonth==NO_EDIT)
+       {
+            Date.Month++;
+       }
     }
     else if (((Date.Day>31)&&(IS_MONTH_31_DAY(Date.Month)))||Date.Day>31)
     {
         Date.Day=1;
        // Date.Day-=31;
-        Date.Month++;
+       if(Date.EditingMonth==NO_EDIT)
+       {
+            Date.Month++;
+       }
+        
     }
     if (Date.Month>12)
     {
         Date.Month=1;
         //Date.Month-=12;
-        Date.Year++;
+       if(Date.EditingYear==NO_EDIT)
+       {
+            Date.Year++;
+       }
+        
     }
     /*Diplay Date and Time*/
     CLCD_ClearScreenAsynch();
@@ -187,6 +249,7 @@ if(ReceiveType.Mode==NORMAL_MODE)
     {
         Diplay_EditHlp();
         ReceiveType.NormalModeOperation=NO_ACTION;
+
     }   
     else
     {
@@ -209,15 +272,8 @@ void Diplay_EditHlp(void)
     CLCD_GoToXYAsynch(Local_RowLinePos,Local_ColLinePos);
     switch (ReceiveType.NormalModeOperation)
     {
-    case NO_ACTION:
-        break;  
-    case EDIT_MODE_OK:
-        Local_ColLinePos=1;
-        Local_RowLinePos=0;
-        break;  
+ 
     case NORMAL_MODE_ACTION_UP:
-        Local_RowLinePos^=1;
-        break;
     case NORMAL_MODE_ACTION_DOWN:
         Local_RowLinePos^=1;
         break;
@@ -464,9 +520,94 @@ void Diplay_EditHlp(void)
         break;
                         
     default:
+    
         break;
     }
+    if(Local_RowLinePos==0&&ReceiveType.NormalModeOperation!=EDIT_MODE_OK)
+    {
+        switch (Local_ColLinePos)
+        {
+        case YEAR_FOURTH_DIGIT:
+        case YEAR_THIRD_DIGIT:
+        case YEAR_SECOND_DIGIT:
+        case YEAR_FIRST_DIGIT:
+            Time.EditingHour=NO_EDIT;
+            Time.EditingMinute=NO_EDIT;
+            Time.EditingSecond=NO_EDIT;
+            Date.EditingDay=NO_EDIT;
+            Date.EditingMonth=NO_EDIT;
+            Date.EditingYear=EDIT;
+            break;
+        case DAY_SECOND_DIGIT:
+        case DAY_FIRST_DIGIT:
+            Time.EditingHour=NO_EDIT;
+            Time.EditingMinute=NO_EDIT;
+            Time.EditingSecond=NO_EDIT;
+            Date.EditingDay=EDIT;
+            Date.EditingMonth=NO_EDIT;
+            Date.EditingYear=NO_EDIT;            
+            break;  
+        case MONTH_SECOND_DIGIT:
+        case MONTH_FIRST_DIGIT:
+            Time.EditingHour=NO_EDIT;
+            Time.EditingMinute=NO_EDIT;
+            Time.EditingSecond=NO_EDIT;
+            Date.EditingDay=NO_EDIT;
+            Date.EditingMonth=EDIT;
+            Date.EditingYear=NO_EDIT;
+            break;    
+        default:
+            Time.EditingHour=NO_EDIT;
+            Time.EditingMinute=NO_EDIT;
+            Time.EditingSecond=NO_EDIT;
+            Date.EditingDay=NO_EDIT;
+            Date.EditingMonth=NO_EDIT;
+            Date.EditingYear=NO_EDIT;
+            break;
+        }
+    }
+    else if (Local_RowLinePos==1&&ReceiveType.NormalModeOperation!=EDIT_MODE_OK)
+    {
+        switch (Local_ColLinePos)
+        {
+        case HOURE_SECOND_DIGIT:
+        case HOURE_FIRST_DIGIT:
+            Time.EditingHour=EDIT;
+            Time.EditingMinute=NO_EDIT;
+            Time.EditingSecond=NO_EDIT;
+            Date.EditingDay=NO_EDIT;
+            Date.EditingMonth=NO_EDIT;
+            Date.EditingYear=NO_EDIT;
+            break;                
+        case MINUTE_SECOND_DIGIT: 
+        case MINUTE_FIRST_DIGIT:
+            Time.EditingHour=NO_EDIT;
+            Time.EditingMinute=EDIT;
+            Time.EditingSecond=NO_EDIT;
+            Date.EditingDay=NO_EDIT;
+            Date.EditingMonth=NO_EDIT;
+            Date.EditingYear=NO_EDIT;
+            break;
+        case SECOND_SECOND_DIGIT:
+        case SECOND_FIRST_DIGIT:
+            Time.EditingHour=NO_EDIT;
+            Time.EditingMinute=NO_EDIT;
+            Time.EditingSecond=EDIT;
+            Date.EditingDay=NO_EDIT;
+            Date.EditingMonth=NO_EDIT;
+            Date.EditingYear=NO_EDIT;
 
+            break;
+        default:
+            Time.EditingHour=NO_EDIT;
+            Time.EditingMinute=NO_EDIT;
+            Time.EditingSecond=NO_EDIT;
+            Date.EditingDay=NO_EDIT;
+            Date.EditingMonth=NO_EDIT;
+            Date.EditingYear=NO_EDIT;
+            break;
+        }
+    }
     
 
 }
