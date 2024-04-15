@@ -73,6 +73,60 @@ Time.Second+=DISPLAY_PERIODICITY;
 if(ReceiveType.Mode==NORMAL_MODE)
 {
     
+
+    if(Time.Second>59)
+    {
+        Time.Second-=59;
+        Time.Minuts++;
+    }
+    if (Time.Minuts>59)
+    {
+        Time.Minuts-=59;
+        Time.Hour++;
+    }
+    if(Time.Hour>23)
+    {
+        Time.Hour=0;
+        //Time.Hour-=23;
+        Date.Day++;
+    }
+    if (Date.Month == 2) // If the month is February
+    {
+        if (Date.Day > 28) // If the day is greater than 28
+        {
+            if (!(Date.Year % 4 == 0 && (Date.Year % 100 != 0 || Date.Year % 400 == 0)))
+            {
+                Date.Day=1;
+                //Date.Day -= 28; // Adjust the day
+                Date.Month++;   // Move to the next month
+            }
+            else if (Date.Day > 29) // If the day is greater than 29 in a leap year
+            {
+                Date.Day=1;
+                //Date.Day -= 29; // Adjust the day
+                Date.Month++;   // Move to the next month
+            }
+        }
+    }
+    else if (Date.Day>30&&(IS_MONTH_30_DAY(Date.Month)))
+    {
+        Date.Day=1;
+        //Date.Day-=30;
+        Date.Month++;
+    }
+    else if (((Date.Day>31)&&(IS_MONTH_31_DAY(Date.Month)))||Date.Day>31)
+    {
+        Date.Day=1;
+       // Date.Day-=31;
+        Date.Month++;
+    }
+    if (Date.Month>12)
+    {
+        Date.Month=1;
+        //Date.Month-=12;
+        Date.Year++;
+    }
+    /*Diplay Date and Time*/
     CLCD_ClearScreenAsynch();
     CLCD_WriteStringAsynch("DATE:",5);
     /*year*/
@@ -128,6 +182,7 @@ if(ReceiveType.Mode==NORMAL_MODE)
     }
     CLCD_WriteNumberAsynch(Time.Second);
     CLCD_DisplaySpecialCharAsynch(1);
+    /******Check Edit Mode************/
     if(ReceiveType.NormalModeEdit==NORMAL_MODE_EDIT)
     {
         Diplay_EditHlp();
@@ -136,62 +191,6 @@ if(ReceiveType.Mode==NORMAL_MODE)
     else
     {
         /*Do Nothing*/
-    }
-    
-    if(Time.Second>59)
-    {
-        Time.Second=0;
-        Time.Minuts++;
-    }
-    if (Time.Minuts>59)
-    {
-        Time.Minuts=0;
-        Time.Hour++;
-    }
-    if(Time.Hour>23)
-    {
-        Time.Hour=0;
-        Date.Day++;
-    }
-    if(Date.Day==29&&Date.Month==2)
-    {
-        if(!(Date.Year % 4 == 0 && (Date.Year % 100 != 0 || Date.Year % 400 == 0)))
-        {
-            Date.Day=1;
-            Date.Month++;
-        }
-        else
-        {
-            /*Do Nothing*/
-        }
-
-    }
-    else if (Date.Day==30&&Date.Month==2)
-    {
-        if((Date.Year % 4 == 0 && (Date.Year % 100 != 0 || Date.Year % 400 == 0)))
-        {
-            Date.Day=1;
-            Date.Month++;
-        }
-        else
-        {
-            /*Do Nothing*/
-        }
-    }
-    else if (Date.Day==31&&(IS_MONTH_30_DAY(Date.Month)))
-    {
-        Date.Day=1;
-        Date.Month++;
-    }
-    else if (((Date.Day==32)&&(IS_MONTH_31_DAY(Date.Month)))||Date.Day>31)
-    {
-        Date.Day=1;
-        Date.Month++;
-    }
-    if (Date.Month>12)
-    {
-        Date.Month=1;
-        Date.Year++;
     }
 
 }
@@ -267,7 +266,7 @@ void Diplay_EditHlp(void)
                 Date.Day+=1;
                 break;                
             case MONTH_SECOND_DIGIT:
-                if (Date.Month>9)
+                /* if (Date.Month>9)
                 {
                     Date.Year++;
                     Date.Month-=2;
@@ -275,14 +274,15 @@ void Diplay_EditHlp(void)
                 else
                 {
                      Date.Month+=10;
-                }               
+                } */
+                Date.Month+=10;               
                 break;
             case MONTH_FIRST_DIGIT:
-               if (Date.Month==12)
+               /* if (Date.Month==12)
                 {
                     Date.Year++;
                     Date.Month=0;
-                }  
+                } */  
                 Date.Month+=1;
                 break;      
             default:
@@ -294,7 +294,7 @@ void Diplay_EditHlp(void)
             switch (Local_ColLinePos)
             {
             case HOURE_SECOND_DIGIT:
-                if(Time.Hour>13)
+                /* if(Time.Hour>13)
                 {
                     Date.Day++;
                     Time.Hour-=14;
@@ -302,18 +302,19 @@ void Diplay_EditHlp(void)
                 else
                 {
                     Time.Hour+=10;
-                }
+                } */
+                Time.Hour+=10;
                 break;
             case HOURE_FIRST_DIGIT:
-                if(Time.Hour==23)
+                /* if(Time.Hour==23)
                 {
                     Date.Day++;
                     Time.Hour=0;
-                }            
+                }             */
                 Time.Hour+=1;
                 break;                
             case MINUTE_SECOND_DIGIT:
-                if(Time.Minuts>49)
+                /* if(Time.Minuts>49)
                 {
                     Time.Hour++;
                     Time.Minuts-=50;
@@ -321,18 +322,19 @@ void Diplay_EditHlp(void)
                 else
                 {
                     Time.Minuts+=10;                    
-                }           
+                }    */  
+                Time.Minuts+=10;      
                 break; 
             case MINUTE_FIRST_DIGIT:
-                if(Time.Minuts==59)
+                /* if(Time.Minuts==59)
                 {
                     Time.Hour++;
                     Time.Minuts=0;
-                }               
+                } */               
                 Time.Minuts+=1;
                 break;
             case SECOND_SECOND_DIGIT:
-                if(Time.Second>49)
+/*                 if(Time.Second>49)
                 {
                     Time.Minuts++;
                     Time.Second-=50;
@@ -340,14 +342,15 @@ void Diplay_EditHlp(void)
                 else
                 {
                     Time.Second+=10;                    
-                }              
+                }  */ 
+                Time.Second+=10;            
                 break;
             case SECOND_FIRST_DIGIT:
-                if(Time.Second==59)
+/*              if(Time.Second==59)
                 {
                     Time.Minuts++;
                     Time.Second=0;
-                }               
+                }   */             
                 Time.Second+=1;
                 break;
             default:
@@ -363,49 +366,49 @@ void Diplay_EditHlp(void)
             switch (Local_ColLinePos)
             {
             case YEAR_FOURTH_DIGIT:
-                if(Date.Year>999)
+                if(Date.Year>1000)
                 {
                     Date.Year-=1000;
                 }
                 break;
             case YEAR_THIRD_DIGIT:
-                if(Date.Year>99)
+                if(Date.Year>100)
                 {
                     Date.Year-=100;
                 }
                 break;             
             case YEAR_SECOND_DIGIT:
-                if(Date.Year>9)
+                if(Date.Year>10)
                 {
                     Date.Year-=10;
                 }
                 break;
             case YEAR_FIRST_DIGIT:
-                if(Date.Year>0)
+                if(Date.Year>1)
                 {
                     Date.Year-=1;
                 }
                 break;
             case DAY_SECOND_DIGIT:
-                if(Date.Day>9)
+                if(Date.Day>10)
                 {
                     Date.Day-=10;
                 }
                 break;
             case DAY_FIRST_DIGIT:
-                if(Date.Day>0)
+                if(Date.Day>1)
                 {
                 Date.Day-=1;  
                 }
                 break;  
             case MONTH_SECOND_DIGIT:
-                if(Date.Month>9)
+                if(Date.Month>10)
                 {
                 Date.Month-=10;
                 }
                 break;
             case MONTH_FIRST_DIGIT:
-                if(Date.Month>0)
+                if(Date.Month>1)
                 {
                 Date.Month-=1;
                 }
