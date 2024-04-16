@@ -69,9 +69,10 @@ typedef struct
  *@return : Error State
  */
 Error_t USART_Init(USART_Config_t Usart_Config);
-
 Error_t USART_SendByte(USART_IDs_t USART_ID, u8 Byte);
 Error_t USART_ReceiveByte(USART_IDs_t USART_ID, u8* Byte);
+Error_t USART_SendByteSynch(USART_IDs_t USART_ID, u8 Byte);
+Error_t USART_ReceiveByteSynch(USART_IDs_t USART_ID, u8* Byte);
 Error_t USART_SendBufferZeroCopy(USART_ReqBuffer_t TXBuffer);
 Error_t USART_ReceiveBufferZeroCopy(USART_ReqBuffer_t RXBuffer);
 

@@ -14,19 +14,7 @@
 #include "USART.h"
 #include "Keypad.h"
 #include "HUSART.h"
-/****************************************************************************************
- *                        	            Variables                                     *
- ****************************************************************************************/
 
-/*
-USART_ReqBuffer_t USART_TX=
-{
-		.Data=NULL,
-		.Size=1,
-		.Channel=USART1,
-		.cbf=NULL
-};
-*/
 /****************************************************************************************
  *                        	              Runnable Implementation                      *
  ****************************************************************************************/
@@ -42,11 +30,7 @@ void SendData_Runnable(void)
 
    if(Loc_Key != NULL)
    {
-	//   USART_SendByte(USART1,Loc_Key);
 	   HUSART_SendByte(USART1,Loc_Key);
    }
-
-   /*USART_TX.Data=&Loc_Key;
-   USART_SendBufferZeroCopy(&USART_TX);*/
 
 }

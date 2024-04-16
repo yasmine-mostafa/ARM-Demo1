@@ -9,9 +9,9 @@
 /****************************************************************************************
  *                        	              Includes                                      *
  ****************************************************************************************/
-#include "STD_Types.h"
-#include "Error.h"
-#include "USART.h"
+#include "../LIB/STD_Types.h"
+#include "../LIB/Error.h"
+#include "Includes/USART.h"
 /****************************************************************************************
  *                        	              Defines                                       *
  ****************************************************************************************/
@@ -34,6 +34,7 @@
 #define TX_DONE 0x00000080
 #define RX_DONE 0x00000020
 #define TC_NOT_COMPLETE 0x00000040
+#define TRANSMIT_EMPTY 0x00000080
 /****************************************************************************************
  *                        	              Types                                         *
  ****************************************************************************************/
@@ -144,12 +145,60 @@ Error_t USART_SendByte(USART_IDs_t Copy_USART_ID, u8 Copy_Byte)
 	}
 	else
 	{
+
+		USART[Copy_USART_ID]->USART_CR1 |= TRANSMITTER_ENABLE;
+		USART[Copy_USART_ID]->USART_DR = Copy_Byte;
+		if((USART[Copy_USART_ID]->USART_SR) & TC_NOT_COMPLETE)
+		{
+			Ret_USARTErrorStatus=Error_OK;
+		}
+		else
+		{
+
+		}
+
+	}
+	return Ret_USARTErrorStatus;
+}
+
+Error_t USART_ReceiveByte(USART_IDs_t Copy_USART_ID, u8* Copy_Byte)
+{
+	Error_t Ret_USARTErrorStatus=Error_NOK;
+
+	if(Copy_USART_ID > USART6)
+	{
+		Ret_USARTErrorStatus=Error_InvalidInput;
+	}
+	else
+	{
+		USART[Copy_USART_ID]->USART_CR1 |= RECEIVER_ENABLE;
+
+		if((USART[Copy_USART_ID]->USART_SR) & (RX_DONE))
+		{
+			*Copy_Byte = USART[Copy_USART_ID]->USART_DR;
+			Ret_USARTErrorStatus=Error_OK;
+		}
+
+	}
+	return Ret_USARTErrorStatus;
+}
+
+Error_t USART_SendByteSynch(USART_IDs_t Copy_USART_ID, u8 Copy_Byte)
+{
+	Error_t Ret_USARTErrorStatus=Error_NOK;
+
+	if(Copy_USART_ID > USART6)
+	{
+		Ret_USARTErrorStatus=Error_InvalidInput;
+	}
+	else
+	{
 		volatile u16 TimeOut = 6000;
 
 		USART[Copy_USART_ID]->USART_CR1 |= TRANSMITTER_ENABLE;
 
 		USART[Copy_USART_ID]->USART_DR = Copy_Byte;
-		//while((((USART[Copy_USART_ID]->USART_SR) >> TC_BIT_SHIFT) & (0x01) == 0) && TimeOut)
+
 		while((((USART[Copy_USART_ID]->USART_SR) & TC_NOT_COMPLETE) == 0 )&& TimeOut)
 	//	while(TimeOut)
 		{
@@ -171,7 +220,8 @@ Error_t USART_SendByte(USART_IDs_t Copy_USART_ID, u8 Copy_Byte)
 	return Ret_USARTErrorStatus;
 }
 
-Error_t USART_ReceiveByte(USART_IDs_t Copy_USART_ID, u8* Copy_Byte)
+
+Error_t USART_ReceiveByteSynch(USART_IDs_t Copy_USART_ID, u8* Copy_Byte)
 {
 	Error_t Ret_USARTErrorStatus=Error_NOK;
 
@@ -205,6 +255,7 @@ Error_t USART_ReceiveByte(USART_IDs_t Copy_USART_ID, u8* Copy_Byte)
 	}
 	return Ret_USARTErrorStatus;
 }
+
 
 Error_t USART_SendBufferZeroCopy(USART_ReqBuffer_t Copy_TXBuffer)
 {
@@ -262,8 +313,6 @@ Error_t USART_ReceiveBufferZeroCopy(USART_ReqBuffer_t Copy_RXBuffer)
 			RX_Req[Copy_RXBuffer.Channel].Position=0;
 
 			USART[Copy_RXBuffer.Channel]->USART_CR1 |= RECEIVER_ENABLE;
-			//Copy_RXBuffer->Data[0]=USART[Copy_RXBuffer->Channel]->USART_DR;
-			//RX_Req[Copy_RXBufferChannel].Position++;
 
 			USART[Copy_RXBuffer.Channel]->USART_CR1 |= RXNEIE_ENABLE;
 
@@ -417,3 +466,6 @@ void USART6_IRQHandler(void)
 
 	}
 }
+
+
+

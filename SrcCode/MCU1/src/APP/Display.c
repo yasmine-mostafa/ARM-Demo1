@@ -5,10 +5,14 @@
  *      Author: Noha
  */
 
-#include "../../include/HAL/LCD/LCD.h"
+
 #include "STD_TYPES.h"
-#include "Keypad.h"
-#define PERIODICITY 500
+#include "Error.h"
+#include "LCD.h"
+#include "Mode.h"
+#include "Edit.h"
+
+#define PERIODICITY 250
 
 #define FIRST_ROW  0
 #define SECOND_ROW 1
@@ -30,29 +34,10 @@
 #define TENS_DIGIT_SECS        11
 #define UNITS_DIGIT_SECS       12
 
-typedef enum
-{
-	No_EditAction,
-	UP_ARROW ,
-	DOWN_ARROW,
-	RIGHT_ARROW,
-	LEFT_ARROW,
-	INCREASE_BUTTON,
-	DECREASE_BUTTON,
-	OK
-}EditPressedButton_t;
+void Edit_Action(void);
 
-typedef enum
-{
-	DISPLAY_MODE,
-	STOP_WATCH_MODE
-}SelectMode_t;
 
-typedef enum
-{
-	EditOFF,
-	EditON
-}EditState_t;
+
 
 SelectMode_t G_enuMode;
 u32 G_u32Years=2023;
@@ -67,11 +52,11 @@ u16 G_u8MSecs;
 
 
 
-EditState_t G_enuEditMode;
+extern EditState_t G_enuEditMode;
 
 u8 G_u8CurrRow=0;
 u8 G_u8CurrCol=4;
-EditPressedButton_t G_enuEditControl;
+extern EditPressedButton_t G_enuEditControl;
 
 u8 G_u8HoursFlag=0;
 u8 G_u8MinsFlag=0;
@@ -91,12 +76,11 @@ void DisplayTimeMode_Runnable(void)
 	u8 Loc_u8DaysBackup;
 	u8 Loc_u8MonthsBackup;
 	u32 Loc_u32YearsBackup;
-	
+
 	G_u8MSecs+=PERIODICITY;
 	if (G_u8MSecs==1000)
 	{
-		i
-		 if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_SECS||G_u8CurrCol==TENS_DIGIT_SECS)&&G_u8CurrRow==SECOND_ROW)
+		 if(G_enuEditMode==Edit_ON && (G_u8CurrCol==UNITS_DIGIT_SECS||G_u8CurrCol==TENS_DIGIT_SECS) && G_u8CurrRow==SECOND_ROW)
 		{
 			Loc_u8SecondsBackup++;
 			G_u8MSecs=0;
@@ -110,11 +94,11 @@ void DisplayTimeMode_Runnable(void)
 
 
 	}
-		
+
 	if(G_u8Secs==60)
 	{
 		G_u8Secs=0;
-		if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==SECOND_ROW)
+		if(G_enuEditMode==Edit_ON&&(G_u8CurrCol==UNITS_DIGIT_MINS||G_u8CurrCol==TENS_DIGIT_MINS)&&G_u8CurrRow==SECOND_ROW)
 		{
 			Loc_u8MinsBackup++;
 
@@ -132,7 +116,7 @@ void DisplayTimeMode_Runnable(void)
 	else if (G_u8Mins==60)
 	{
 		G_u8Mins = 0;
-		if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==SECOND_ROW)
+		if(G_enuEditMode==Edit_ON&&(G_u8CurrCol==UNITS_DIGIT_HOURS||G_u8CurrCol==TENS_DIGIT_HOURS)&&G_u8CurrRow==SECOND_ROW)
 		{
 			Loc_u8HoursBackup++;
 		}
@@ -142,12 +126,12 @@ void DisplayTimeMode_Runnable(void)
 
 		}
 	}
-	
-		
+
+
 	if (G_u8hours==24)
 	{
 		G_u8hours = 0;
-		if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==FIRST_ROW)
+		if(G_enuEditMode==Edit_ON&&(G_u8CurrCol==UNITS_DIGIT_DAY||G_u8CurrCol==TENS_DIGIT_DAY)&&G_u8CurrRow==FIRST_ROW)
 		{
 			Loc_u8DaysBackup++;
 
@@ -168,7 +152,7 @@ void DisplayTimeMode_Runnable(void)
 		if(G_u8Month==2 && (G_u32Years%4 !=0))
 		{
 			G_u8Days = 1;
-			if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==FIRST_ROW)
+			if(G_enuEditMode==Edit_ON&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==FIRST_ROW)
 			{
 				Loc_u8MonthsBackup++;
 
@@ -185,7 +169,7 @@ void DisplayTimeMode_Runnable(void)
 		if(G_u8Month==2 && (G_u32Years%4 ==0))
 		{
 			G_u8Days = 1;
-			if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==FIRST_ROW)
+			if(G_enuEditMode==Edit_ON&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==FIRST_ROW)
 			{
 				Loc_u8MonthsBackup++;
 
@@ -196,7 +180,7 @@ void DisplayTimeMode_Runnable(void)
 			}
 		}
 	}
-		
+
 
 	if (G_u8Days==31)
 	{
@@ -206,7 +190,7 @@ void DisplayTimeMode_Runnable(void)
 				||G_u8Month==11)
 		{
 				G_u8Days = 1;
-				if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==FIRST_ROW)
+				if(G_enuEditMode==Edit_ON&&(G_u8CurrCol==UNITS_DIGIT_MONTH||G_u8CurrCol==TENS_DIGIT_MONTH)&&G_u8CurrRow==FIRST_ROW)
 				{
 					Loc_u8MonthsBackup++;
 
@@ -235,7 +219,7 @@ void DisplayTimeMode_Runnable(void)
 	if (G_u8Month>12)
 	{
 		G_u8Month = 1;
-		if(G_enuEditMode==EditON&&(G_u8CurrCol==UNITS_DIGIT_YEAR
+		if(G_enuEditMode==Edit_ON&&(G_u8CurrCol==UNITS_DIGIT_YEAR
 			||G_u8CurrCol==TENS_DIGIT_YEAR
 			||G_u8CurrCol==HUNDEREDS_DIGIT_YEAR
 			||G_u8CurrCol==THOUSANDS_DIGIT_YEAR)&&G_u8CurrRow==FIRST_ROW)
@@ -250,12 +234,12 @@ void DisplayTimeMode_Runnable(void)
 		}
 
 	}
-	if(G_enuMode==DISPLAY_MODE)
+	if(G_enuMode==Display_Mode)
 	{
 
 		LCD_ClearScreenAsynch();
 		LCD_WriteStringAsynch("DATE:");
-		
+
 		if(G_u8Days>=10)
 		{
 			LCD_WriteNumberAsynch(G_u8Days);
@@ -316,13 +300,13 @@ void DisplayTimeMode_Runnable(void)
 		{
 			LCD_WriteNumberAsynch(G_u8Secs);
 		}
-		
+
 
 
 
 	}
 
-	if(G_enuEditMode==EditON)
+	if(G_enuEditMode==Edit_ON)
 	{
 				if((G_u8CurrCol==UNITS_DIGIT_SECS||G_u8CurrCol==TENS_DIGIT_SECS)&&G_u8CurrRow==1&&G_u8SecsFlag==0)
 		{
@@ -496,7 +480,7 @@ void Edit_Action(void)
 	//KEYPAD_voidGetPressedKey(&G_enuEditControl);
 	switch(G_enuEditControl)
 	{
-		case DOWN_ARROW:
+		case Down_Arrow:
 			if(G_u8CurrRow==0)
 			{
 				G_u8CurrRow++;
@@ -508,7 +492,7 @@ void Edit_Action(void)
 			}
 
 			break;
-		case UP_ARROW:
+		case Up_Arrow:
 			if(G_u8CurrRow==1)
 			{
 				G_u8CurrRow--;
@@ -519,7 +503,7 @@ void Edit_Action(void)
 			}
 
 			break;
-		case RIGHT_ARROW:
+		case Right_Arrow:
 			if(G_u8CurrCol<15)
 			{
 				G_u8CurrCol++;
@@ -530,7 +514,7 @@ void Edit_Action(void)
 
 			}
 			break;
-		case LEFT_ARROW:
+		case Left_Arrow:
 			if(G_u8CurrCol>0)
 			{
 				G_u8CurrCol--;
@@ -540,8 +524,8 @@ void Edit_Action(void)
 
 			}
 			break;
-		case OK:
-			G_enuEditMode=EditOFF;
+		case Edit_Ok:
+			G_enuEditMode=Edit_OFF;
 			G_u8SecsFlag=0;
 			G_u8HoursFlag=0;
 			G_u8MinsFlag=0;
@@ -549,7 +533,7 @@ void Edit_Action(void)
 			G_u8MonthsFlag=0;
 			G_uYearsFlag=0;
 			break;
-		case DECREASE_BUTTON:
+		case Decrease_Button:
 			switch(G_u8CurrRow)
 			{
 			case FIRST_ROW:
@@ -603,7 +587,7 @@ void Edit_Action(void)
 
 				}
 			break;
-			case INCREASE_BUTTON:
+			case Increase_Button:
 			switch(G_u8CurrRow)
 			{
 
@@ -662,10 +646,10 @@ void Edit_Action(void)
 		default:
 			break;
 
-		
+
 
 	}
-	G_enuEditControl=No_EditAction;
+	G_enuEditControl=No_Edit_Action;
 
 }
 

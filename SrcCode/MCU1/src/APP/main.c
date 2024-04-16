@@ -56,16 +56,9 @@
 #include "STD_TYPES.h"
 #include "RCC.h"
 #include "GPIO.h"
-#include "LED_CFG.h"
-#include "LED.h"
-#include "SWITCH_CFG.h"
-#include "SWITCH.h"
 #include "NVIC.h"
-#include "SYSTICK_CFG.h"
-#include "SYSTICK.h"
-#include "SERVICE/Includes/SCHED_CFG.h"
-#include "SERVICE/Includes/SCHED.h"
-#include "LCD_CFG.h"
+#include "Systick.h"
+#include "sched.h"
 #include "LCD.h"
 #include "USART.h"
 #include "Keypad.h"
@@ -74,74 +67,14 @@
 int
 main(void)
 {
-	//RCC_EnablePeripheral(Bus_AHB1,PERIPHERAL_GPIOA);
-	RCC_EnablePeripheral(Bus_AHB1,PERIPHERAL_GPIOB);
-	//RCC_EnablePeripheral(Bus_APB2,PERIPHERAL_USART1);
-
-
-/*
-	GPIO_Config_t GPIO_UART_TX=
-	{
-			.Port=GPIO_PORTA,
-			.Pin=GPIO_PIN9,
-			. Mode= GPIO_MODE_AF_PP,
-			. Speed = GPIO_SPEED_HIGH,
-	};
-
-	GPIO_Config_t GPIO_UART_RX=
-	{
-			.Port=GPIO_PORTA,
-			.Pin=GPIO_PIN10,
-			. Mode= GPIO_MODE_AF_PP,
-			. Speed = GPIO_SPEED_HIGH,
-	};
-
-/*	USART_strCfg_t USART_Config =
-	{
-			.pUartInstance=USART1,
-			.Stop_bits=USART_1StopBit,
-			.Word_bits=USART_8Bits,
-			.ParityControl=USART_DisableParity,
-			.TransmitterControl=USART_EnableTX,
-			.ReceiverControl=USART_EnableRX,
-			.TXE_Enable=USART_Enable,
-			.RXNE_Enable=USART_Enable,
-			.TXCE_Enable=USART_Enable,
-			.UartEnable=USART_Enable,
-			.BaudRate=9600,
-			.Oversampling=OVERSAMPLING_16
-	};*/
-
-
-	USART_Config_t USART_Config=
-	{
-		.USART_ID=USART1,
-		.BaudRate=9600,
-		.OverSampling=OVERSAMPLING_16,
-		.WordLength=WORD_LENGTH_8,
-		.ParityEnable=PARITY_DISABLED,
-		.StopBits=STOP_BITS_1
-	};
-
-/*
-	GPIO_InitPinAF(&GPIO_UART_TX,GPIO_AF_USART1_2);
-	GPIO_InitPinAF(&GPIO_UART_RX,GPIO_AF_USART1_2);
-
-	USART_Init(USART_Config);*/
-	HUSART_Init(USART_Config);
-
-	//STK_Init(CLK_AHB,MODE_ENABLE_INT);
-
-	LCD_InitAsynch();
-
-	LED_Init();
-	KEYPAD_Init();
-
-
-	LED_Init();
-	SCHED_Init();
-	//NVIC_EnableIRQ(IRQ_USART1);
-	SCHED_Start();
+	 RCC_EnableAHB1Peri(AHB1ENR_GPIOAEN);
+	 RCC_EnableAHB1Peri(AHB1ENR_GPIOBEN);
+	 RCC_EnableAPB2Peri(APB2ENR_USART1EN);
+	 HUSART_Init();
+	 LCD_InitAsynch();
+	 KEYPAD_Init();
+	 sched_init();
+	 sched_start();
 }
 
 //#pragma GCC diagnostic pop

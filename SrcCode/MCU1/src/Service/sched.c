@@ -5,8 +5,8 @@
  *      Author: Noha
  */
 
-#include "../INCLUDES/sched_cfg.h"
-#include "../../MCAL/INCLUDES/systick.h"
+#include "Includes/sched_cfg.h"
+#include "../MCAL/Includes/systick.h"
 
 #define TICKMs 1
 extern const runnable_t runnables[NUM_OF_RUNNABLES];

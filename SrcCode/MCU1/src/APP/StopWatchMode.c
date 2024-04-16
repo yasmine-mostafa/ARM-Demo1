@@ -54,7 +54,7 @@ void StopWatchMode_Runnable(void) ////50 msec
 	static u32 Loc_Mode=MODE_OFF;
 
 	/*Check if stop watch mode is on then display it on the LCD*/
-	if(G_enuMode == STOP_WATCH_MODE)
+	if(G_enuMode == StopWatch_Mode)
 	{
 		LCD_ClearScreenAsynch();
 		LCD_SetCursorPositionAsynch(FIRST_ROW,STRING_COLUMN);
@@ -102,19 +102,19 @@ void StopWatchMode_Runnable(void) ////50 msec
 
 		switch(G_enuStopWatchControl)
 		{
-		case STOP_WATCH_START:
+		case StopWatch_On:
 			Loc_Mode = MODE_ON;
 			break;
 
-		case STOP_WATCH_PAUSE:
+		case StopWatch_Pause:
 			Loc_Mode = MODE_OFF;
 			break;
 
-		case STOP_WATCH_CONTINUE:
+	/*	case StopWatch_Continue:
 			Loc_Mode = MODE_ON;
-			break;
+			break;*/
 
-		case STOP_WATCH_RESET:
+		case StopWatch_Reset:
 			Loc_Mode = MODE_RESET;
 			break;
 
