@@ -23,9 +23,7 @@
  *                        	              Defines                                       *
  ****************************************************************************************/
 
-#define START 0
 #define PAUSE 2
-#define CONTINUE 2
 #define STOPWATCH_ON 1
 
 /****************************************************************************************
@@ -72,15 +70,8 @@ void ReceiveData_Runnable(void)
 				/*Pause stopwatch*/
 			case PAUSE:
 				G_enuStopWatchControl = StopWatch_Pause;
-			//	Loc_StopWatchCount = CONTINUE;
 				Loc_StopWatchCount =STOPWATCH_ON;
 				break;
-
-				/*continue stopwatch*/
-		/*	case CONTINUE:
-				G_enuStopWatchControl = StopWatch_Continue;
-				Loc_StopWatchCount = PAUSE;
-				break;*/
 
 			default:
 				break;

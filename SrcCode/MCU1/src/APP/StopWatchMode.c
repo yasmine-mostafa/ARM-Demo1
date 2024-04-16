@@ -110,10 +110,6 @@ void StopWatchMode_Runnable(void) ////50 msec
 			Loc_Mode = MODE_OFF;
 			break;
 
-	/*	case StopWatch_Continue:
-			Loc_Mode = MODE_ON;
-			break;*/
-
 		case StopWatch_Reset:
 			Loc_Mode = MODE_RESET;
 			break;
