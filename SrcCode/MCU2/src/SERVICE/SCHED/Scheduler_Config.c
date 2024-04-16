@@ -68,7 +68,7 @@ const Runnable_t Runnable[_Runnables_Num]=
         .Priority= Sender_Runnable,
         .cb = Sender_RunnableFunc,    
         .FirstDelayMS= 6,
-        .PeriodicityMS= 50,
+        .PeriodicityMS= 60,
     },
     [Receiver_Runnable]=
     {
@@ -76,7 +76,7 @@ const Runnable_t Runnable[_Runnables_Num]=
         .Priority= Receiver_Runnable,
         .cb = Receive_RunnableFunc,    
         .FirstDelayMS= 2,
-        .PeriodicityMS= 25 ,
+        .PeriodicityMS= 30 ,
     },
     [StopWatch_R]=
     {
