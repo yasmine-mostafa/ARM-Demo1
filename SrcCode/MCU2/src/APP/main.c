@@ -1,9 +1,7 @@
 #include "STD_TYPES.h"
 #include "MRCC/RCC.h"
 #include "MGPIO/GPIO.h"
-#include "MNVIC/MNVIC.h"
-#include "HLED/LED.h"
-#include "HSWITCH/SWITCH.h"
+//#include "MNVIC/MNVIC.h"
 #include "SERVICE/SCHED/Scheduler.h"
 #include "HCLCD/LCD.h"
 #include "HKPD/KYD.h"
@@ -14,10 +12,10 @@
 int main()
 {
     u8 Loc_Smile[8]=HCLCD_SMILY_FACE;
-    MRCC_ControlClockAHP1Peripheral(RCC_AHB1_GPIOA,RCC_ENABLE);
-    MRCC_ControlClockAHP1Peripheral(RCC_AHB1_GPIOB,RCC_ENABLE);
-    MRCC_ControlClockABP2Peripheral(RCC_APB2_USART1,RCC_ENABLE);
-    MNVIC_EnableInterrupt(NVIC_IRQ_USART1);
+    RCC_ControlPeripheralClock(Peri_GPIOA,PeriStatus_Enable,PowerMode_Normal);
+    RCC_ControlPeripheralClock(Peri_GPIOB,PeriStatus_Enable,PowerMode_Normal);
+    RCC_ControlPeripheralClock(Peri_USART1,PeriStatus_Enable,PowerMode_Normal);
+    //MNVIC_EnableInterrupt(NVIC_IRQ_USART1);
     USART_strCfg_t Usart1_Config;
     Usart1_Config.BaudRate=9600;
     Usart1_Config.Oversampling=OVERSAMPLING_16;
@@ -55,7 +53,6 @@ int main()
     CLCD_InitAsynch();
     CLCD_WriteSpecialCharAsynch(&Loc_Smile,1);
     KPD_INIT();
-    //HLED_Init();
 	USART_Init(&Usart1_Config);
     //USART_ReceiveBufferAsynchronous(&rx_buff);
 	//USART_RegisterCallBackFunction(UART1_RECEIVE,Receive_RunnableFunc);
