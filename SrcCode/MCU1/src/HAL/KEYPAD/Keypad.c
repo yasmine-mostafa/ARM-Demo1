@@ -7,7 +7,6 @@
 #include "Error.h"
 #include "STD_TYPES.h"
 #include "GPIO.h"
-//#include "../INCLUDES/SWITCH.h"
 #include "Keypad.h"
 
 
@@ -15,7 +14,7 @@ extern const KEYPAD_t KEYPAD_Configuration[NUM_OF_PINS];
 extern const u8 KEYPAD_Keys[ROWS_NUM][COLS_NUM];
 u8 G_col=0;
 u8 G_row=0;
-u8 G_swState[ROWS_NUM][COLS_NUM]={0};
+u8 G_swState=0;
 //KeypadPost_t KEYPAD_postion;
 
 void KEYPAD_Init(void)
@@ -34,7 +33,7 @@ void KEYPAD_Init(void)
 				sw.Mode=GPIO_MODE_INPUT_PD;
 				break;
 			case OTPUT_NO_CONNSCTION:
-				sw.Mode=GPIO_MODE_OUTPUT_PP_PU;
+				sw.Mode=GPIO_MODE_OUTPUT_PP;
 				break;
 
 			default:
@@ -46,7 +45,7 @@ void KEYPAD_Init(void)
 		GPIO_InitPin(&sw);
 		}
 
-	/*setting default value of rows to be 1 (high) as they are outputs the other pullup resistors are already set to 1*/
+	//setting default value of rows to be 1 (high) as they are outputs the other pullup resistors are already set to 1/
 	for (int itr=0; itr<ROWS_NUM; itr++)
 	{
 		GPIO_SetPinValue(KEYPAD_Configuration[itr+COLS_NUM].port,KEYPAD_Configuration[itr].pin,GPIO_STATE_HIGH);
@@ -64,7 +63,7 @@ KEYPAD_enuErrorStatus_t KEYPAD_voidGetPressedKey(u8 * Copy_pu8KeyValue)
 	}
 	else
 	{
-		* Copy_pu8KeyValue=G_swState[G_row][G_col];
+		* Copy_pu8KeyValue=G_swState;
 	}
 	return KEYPAD_enuErrorStatus;
 }
@@ -77,58 +76,8 @@ void KEYPADGetKey_Runnable(void)
 	static u32 Loc_swPrev[ROWS_NUM][COLS_NUM]={0};
 	static u32  Loc_swCounts[ROWS_NUM][COLS_NUM]={0};
 	u8 flag=0;
-	//Rows->output
-	/*for (u8 row=0;row<16;row++)
-	{
-		KEYPAD_postion.row=row/4;
-		GPIO_setPinValue(KEYPAD_Configuration[KEYPAD_postion.row+4].port,KEYPAD_Configuration[KEYPAD_postion.row+4].pin,VALUE_SET_LOW);
-		if(KEYPAD_postion.col<4)
-		{
-			GPIO_getPinValue(KEYPAD_Configuration[KEYPAD_postion.col].port,KEYPAD_Configuration[KEYPAD_postion.col].pin,&Loc_swcurrent);
-
-			if(Loc_swcurrent==Loc_swPrev[KEYPAD_postion.row][KEYPAD_postion.col])
-			{
-				Loc_swCounts[KEYPAD_postion.row][KEYPAD_postion.col]++;
-			}
-			else
-			{
-				Loc_swCounts[KEYPAD_postion.row][KEYPAD_postion.col]=0;
-			}
-			if(Loc_swCounts[KEYPAD_postion.row][KEYPAD_postion.col]==5)
-			{
-				G_row=KEYPAD_postion.row;
-				G_col=KEYPAD_postion.col;
-				Loc_swcurrent^=KEYPAD_Configuration[KEYPAD_postion.col].connection;
-				if(Loc_swcurrent==SWITCH_PRESSED)
-				{
-					Loc_swcurrent=KEYPAD_Keys[G_row][G_col];
-					G_swState[KEYPAD_postion.row][KEYPAD_postion.col]=Loc_swcurrent;
-					Loc_swCounts[KEYPAD_postion.row][KEYPAD_postion.col]=0;
-					break;
-				}
-				else
-				{
-					G_swState[KEYPAD_postion.row][KEYPAD_postion.col]=Loc_swcurrent;
-					Loc_swCounts[KEYPAD_postion.row][KEYPAD_postion.col]=0;
-				}
-
-			}
-			else
-			{
-
-			}
-
-			Loc_swPrev[KEYPAD_postion.row][KEYPAD_postion.col]=Loc_swcurrent;
-			KEYPAD_postion.col++;
-		}
-		else
-		{
-			GPIO_setPinValue(KEYPAD_Configuration[KEYPAD_postion.row+4].port,KEYPAD_Configuration[KEYPAD_postion.row+4].pin,VALUE_SET_HIGH);
-			KEYPAD_postion.col=0;
-		}
-	}
-	*/
-	for (u8 itr1=0; itr1<ROWS_NUM; itr1++)
+	u8 Send_counter=0;
+	for (u8 itr1=0; itr1<ROWS_NUM && flag==0 ; itr1++)
 	{
 		GPIO_SetPinValue(KEYPAD_Configuration[itr1+COLS_NUM].port,KEYPAD_Configuration[itr1+COLS_NUM].pin,GPIO_STATE_LOW);
 		//col->i/p
@@ -143,47 +92,41 @@ void KEYPADGetKey_Runnable(void)
 			else
 			{
 				Loc_swCounts[itr1][itr2]=0;
+				Loc_swPrev[itr1][itr2]=Loc_swcurrent;
 			}
 			if(Loc_swCounts[itr1][itr2]==5)
 			{
-				G_row=itr1;
-				G_col=itr2;
-				Loc_swcurrent^=KEYPAD_Configuration[itr2].connection;
-				if(Loc_swcurrent==SWITCH_PRESSED)
+				if(Loc_swcurrent==GPIO_STATE_LOW)
 				{
-					Loc_swcurrent=KEYPAD_Keys[G_row][G_col];
-					G_swState[itr1][itr2]=Loc_swcurrent;
+					G_row=itr1;
+					G_col=itr2;	
+					G_swState=KEYPAD_Keys[G_row][G_col];
 					Loc_swCounts[itr1][itr2]=0;
+					//Loc_swcurrent=0;
 					flag=1;
 					break;
+				
 				}
 				else
 				{
-					G_swState[itr1][itr2]=Loc_swcurrent;
-					Loc_swCounts[itr1][itr2]=0;
+					
+					//G_swState=0;
 
 				}
-
+				
 
 			}
-			else
+			else if(Loc_swCounts[itr1][itr2]<5)
 			{
+				G_swState=0;
 
 			}
-
-			Loc_swPrev[itr1][itr2]=Loc_swcurrent;
+			//Loc_swPrev[itr1][itr2]=Loc_swcurrent;
 
 		}
+		
 		GPIO_SetPinValue(KEYPAD_Configuration[itr1+COLS_NUM].port,KEYPAD_Configuration[itr1+COLS_NUM].pin,GPIO_STATE_HIGH);
-		if (flag==1)
-		{
-			flag=0;
-			break;
-		}
-		else
-		{
 
-		}
 	}
-}
 
+}
