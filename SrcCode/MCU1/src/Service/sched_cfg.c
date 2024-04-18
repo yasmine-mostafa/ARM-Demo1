@@ -17,9 +17,9 @@ extern void StopWatchMode_Runnable(void);
 const runnable_t runnables[NUM_OF_RUNNABLES]=
 {
 	[FIRST_RUNNABLE]={.name="LCD", .firstDelayMs=2 , .periodicityMs=2, .cb=LCD_Task },
-	[SECOND_RUNNABLE]={.name="KeypadGetKey", .firstDelayMs=5 , .periodicityMs=5, .cb=KEYPADGetKey_Runnable},
-    [THIRD_RUNNABLE]={.name="SendData", .firstDelayMs=60 , .periodicityMs=60, .cb=SendData_Runnable },
-	[FOURTH_RUNNABLE]={.name="ReceiveData", .firstDelayMs=0 , .periodicityMs=30, .cb=ReceiveData_Runnable },
+	[SECOND_RUNNABLE]={.name="KeypadGetKey", .firstDelayMs=0 , .periodicityMs=7, .cb=KEYPADGetKey_Runnable},
+    [THIRD_RUNNABLE]={.name="SendData", .firstDelayMs=6 , .periodicityMs=60, .cb=SendData_Runnable },
+	[FOURTH_RUNNABLE]={.name="ReceiveData", .firstDelayMs=2 , .periodicityMs=30, .cb=ReceiveData_Runnable },
 	[FIFTH_RUNNABLE]={.name="Display", .firstDelayMs=0 , .periodicityMs=250, .cb=DisplayTimeMode_Runnable },
 	[SIXTH_RUNNABLE]={.name="StopWatch", .firstDelayMs=400 , .periodicityMs=400, .cb=StopWatchMode_Runnable },
 };
