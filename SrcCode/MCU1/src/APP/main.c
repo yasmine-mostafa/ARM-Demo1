@@ -63,18 +63,19 @@
 #include "USART.h"
 #include "Keypad.h"
 #include "HUSART.h"
+#include "HRCC.h"
 
 int
 main(void)
 {
-	 RCC_EnableAHB1Peri(AHB1ENR_GPIOAEN);
-	 RCC_EnableAHB1Peri(AHB1ENR_GPIOBEN);
-	 RCC_EnableAPB2Peri(APB2ENR_USART1EN);
-	 HUSART_Init();
-	 LCD_InitAsynch();
-	 KEYPAD_Init();
-	 sched_init();
-	 sched_start();
+	HRCC_EnablePeriphral(GPIOAEN);
+	HRCC_EnablePeriphral(GPIOBEN);
+	HRCC_EnablePeriphral(USART1EN);
+	HUSART_Init();
+	LCD_InitAsynch();
+	KEYPAD_Init();
+	sched_init();
+	sched_start();
 }
 
 //#pragma GCC diagnostic pop
